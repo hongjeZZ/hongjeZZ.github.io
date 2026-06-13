@@ -6,7 +6,6 @@ url: "https://hongjeZZ.github.io"
 baseurl: ""
 lang: ko-KR
 timezone: Asia/Seoul
-image: /assets/og-default.png
 
 author:
   name: hongjeZZ
@@ -28,6 +27,10 @@ plugins:
   - jekyll-sitemap
 
 defaults:
+  - scope:
+      path: ""
+    values:
+      image: /assets/og-default.png
   - scope:
       path: ""
       type: posts
