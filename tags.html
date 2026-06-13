@@ -3,21 +3,44 @@ layout: default
 title: 태그
 permalink: /tags/
 ---
-<h1 class="page-title">태그</h1>
 {%- assign tags = site.tags | sort -%}
 {%- if tags.size == 0 -%}
-<p class="hero-sub">아직 태그가 없습니다.</p>
+<p class="muted-note">아직 태그가 없습니다.</p>
 {%- else -%}
-{%- for tag in tags -%}
-<section class="tag-section" id="{{ tag[0] | slugify }}">
-  <h2 class="tag-heading"><span class="tag-hash">#</span>{{ tag[0] }}<span class="tag-cnt">{{ tag[1] | size }}</span></h2>
-  {%- for post in tag[1] -%}
-  <a class="entry" href="{{ post.url | relative_url }}">
-    <time class="entry-date" datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%y.%m.%d" }}</time>
-    <span class="entry-body"><span class="entry-title">{{ post.title }}</span></span>
-    <span class="entry-arrow" aria-hidden="true">→</span>
-  </a>
+<div class="tag-cloud">
+  {%- for tag in tags -%}
+  <button type="button" class="tag-chip" data-tag="{{ tag[0] | slugify }}">#{{ tag[0] }} <span class="tag-chip-count">{{ tag[1] | size }}</span></button>
   {%- endfor -%}
-</section>
-{%- endfor -%}
+</div>
+<div id="tag-posts">
+  {%- for tag in tags -%}
+  <div class="tag-group entries" id="{{ tag[0] | slugify }}" data-tag="{{ tag[0] | slugify }}" hidden>
+    {%- for post in tag[1] -%}
+    <a class="entry" href="{{ post.url | relative_url }}">
+      <time class="entry-date" datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y.%m.%d" }}</time>
+      <span class="entry-body"><span class="entry-title">{{ post.title }}</span></span>
+      <span class="entry-arrow" aria-hidden="true">→</span>
+    </a>
+    {%- endfor -%}
+  </div>
+  {%- endfor -%}
+</div>
+<script>
+  (function () {
+    var chips = Array.prototype.slice.call(document.querySelectorAll('.tag-chip'));
+    var groups = Array.prototype.slice.call(document.querySelectorAll('.tag-group'));
+    if (!chips.length) return;
+    function select(slug) {
+      var matched = false;
+      chips.forEach(function (c) { var on = c.dataset.tag === slug; c.classList.toggle('active', on); if (on) matched = true; });
+      groups.forEach(function (g) { g.hidden = g.dataset.tag !== slug; });
+      if (matched) { try { history.replaceState(null, '', '#' + slug); } catch (e) {} }
+      return matched;
+    }
+    chips.forEach(function (c) { c.addEventListener('click', function () { select(c.dataset.tag); }); });
+    var hash = '';
+    try { hash = decodeURIComponent(location.hash.replace('#', '')).trim(); } catch (e) {}
+    if (!select(hash)) { select(chips[0].dataset.tag); }
+  })();
+</script>
 {%- endif -%}
