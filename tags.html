@@ -15,8 +15,9 @@ description: 글을 태그별로 모아 봅니다.
 </div>
 <div id="tag-posts">
   {%- for tag in tags -%}
-  <section class="tag-group entries" id="{{ tag[0] | slugify }}" data-tag="{{ tag[0] | slugify }}" hidden>
-    <div class="tag-group-list">
+  <section class="tag-group" id="{{ tag[0] | slugify }}" data-tag="{{ tag[0] | slugify }}">
+    <header class="tag-group-head"><span class="tag-group-name">#{{ tag[0] }}</span><span class="tag-group-count">{{ tag[1] | size }}편</span></header>
+    <div class="tag-group-list entries">
       {%- for post in tag[1] -%}
       <a class="entry" href="{{ post.url | relative_url }}">
         <time class="entry-date" datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y.%m.%d" }}</time>
@@ -91,32 +92,54 @@ description: 글을 태그별로 모아 봅니다.
     }
     groups.forEach(paginate);
 
-    // ── 칩 선택 ↔ 그룹 표시 (해시 동기화) ──
+    // ── 칩 = 토글 필터. 선택 없으면 전체 표시, 누른 칩 다시 클릭 시 해제 ──
+    var activeSlug = null;
+
+    function showAll() {
+      activeSlug = null;
+      chips.forEach(function (c) {
+        c.classList.remove('active');
+        c.setAttribute('aria-pressed', 'false');
+      });
+      groups.forEach(function (g) {
+        g.hidden = false;
+        if (g._showFirst) g._showFirst();
+      });
+      try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+    }
+
     function select(slug) {
-      var matched = false;
+      var matched = chips.some(function (c) { return c.dataset.tag === slug; });
+      if (!matched) return false;
+      activeSlug = slug;
       chips.forEach(function (c) {
         var on = c.dataset.tag === slug;
         c.classList.toggle('active', on);
         c.setAttribute('aria-pressed', on ? 'true' : 'false');
-        if (on) matched = true;
       });
       groups.forEach(function (g) {
         var on = g.dataset.tag === slug;
         g.hidden = !on;
         if (on && g._showFirst) g._showFirst();
       });
-      if (matched) { try { history.replaceState(null, '', '#' + slug); } catch (e) {} }
-      return matched;
+      try { history.replaceState(null, '', '#' + slug); } catch (e) {}
+      return true;
     }
-    chips.forEach(function (c) { c.addEventListener('click', function () { select(c.dataset.tag); }); });
+
+    chips.forEach(function (c) {
+      c.addEventListener('click', function () {
+        if (activeSlug === c.dataset.tag) showAll();
+        else select(c.dataset.tag);
+      });
+    });
 
     var hash = '';
     try { hash = decodeURIComponent(location.hash.replace('#', '')).trim(); } catch (e) {}
-    if (!select(hash)) { select(chips[0].dataset.tag); }
+    if (!(hash && select(hash))) showAll();
     window.addEventListener('hashchange', function () {
       var h = '';
       try { h = decodeURIComponent(location.hash.replace('#', '')).trim(); } catch (e) {}
-      if (h) select(h);
+      if (h) select(h); else showAll();
     });
   })();
 </script>

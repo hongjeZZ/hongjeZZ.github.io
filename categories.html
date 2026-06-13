@@ -8,7 +8,6 @@ description: 글을 카테고리별로 모아 봅니다.
 {%- if cats.size == 0 -%}
 <p class="muted-note">아직 카테고리가 없습니다.</p>
 {%- else -%}
-<p class="cat-intro">주제별 묶음으로 글을 둘러보세요. 카테고리당 처음 6편이 보이고, <span class="cat-intro-em">더 보기</span>로 나머지를 펼칠 수 있습니다.</p>
 <div class="cat-directory">
   {%- for cat in cats -%}
   {%- assign cat_count = cat[1] | size -%}

@@ -300,14 +300,16 @@ html[data-theme="dark"] { --callout-note: #8aa0ff; --callout-tip: #6cc191; --cal
 .tag-chip--cloud { line-height: 1.2; padding: 5px 13px; }
 .tag-chip--cloud .tag-chip-count { font-size: 0.8em; }
 
-/* 선택된 태그 그룹 본문 */
+/* 태그 그룹: mono 키워드 헤더로 category(serif)와 시각적 차별화 */
+.tag-group { margin: 0 0 28px; }
+.tag-group-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+.tag-group-name { font-family: var(--font-mono); font-size: 15px; font-weight: 600; color: var(--accent); }
+.tag-group-count { font-size: 12px; color: var(--muted); }
 .tag-group .tag-group-list { margin-top: 6px; }
 
 /* ════════════════════════════════════════════════
    categories page — sectioned directory (distinct)
    ════════════════════════════════════════════════ */
-.cat-intro { font-size: 15px; color: var(--muted); margin: 26px 0 10px; }
-.cat-intro-em { color: var(--accent); font-weight: 500; }
 .cat-directory { margin-top: 16px; }
 
 .cat-section { padding: 26px 0; border-top: 1px solid var(--border); scroll-margin-top: 26px; }
