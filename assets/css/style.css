@@ -37,7 +37,9 @@ body {
   text-rendering: optimizeLegibility;
   transition: background 0.25s ease, color 0.25s ease;
 }
-.wrap { max-width: 700px; margin: 0 auto; padding: 0 26px; }
+.wrap { max-width: 820px; margin: 0 auto; padding: 0 26px; }
+/* 포스트·페이지 본문은 읽기 좋은 폭으로 좁혀 가운데 정렬 (헤더·홈 목록은 넓게) */
+.post, .page { max-width: 720px; margin-left: auto; margin-right: auto; }
 
 /* ── header / nav ── */
 .site-header { padding-top: 22px; border-bottom: 1px solid var(--border); }
