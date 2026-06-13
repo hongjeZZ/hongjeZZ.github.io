@@ -113,7 +113,9 @@ main.wrap { padding-bottom: 72px; }
 .post-header { margin: 30px 0 32px; }
 .post-kicker { margin: 0 0 11px; }
 .post-title { font-family: var(--font-serif); font-weight: 700; font-size: 34px; line-height: 1.32; letter-spacing: -0.8px; color: var(--text); margin: 0; }
-.post-date { display: block; font-family: var(--font-mono); font-size: 13px; color: var(--faint); margin-top: 14px; }
+.post-meta { display: flex; align-items: baseline; gap: 10px; margin-top: 14px; font-family: var(--font-mono); font-size: 13px; color: var(--faint); }
+.post-meta .dot { color: var(--border); }
+.post-date { font-family: var(--font-mono); font-size: 13px; color: var(--faint); }
 
 .post-content { font-size: 17px; line-height: 1.85; }
 .post-content > *:first-child { margin-top: 0; }
@@ -146,6 +148,47 @@ main.wrap { padding-bottom: 72px; }
 .pnav-dir { font-family: var(--font-mono); font-size: 12px; color: var(--faint); }
 .pnav-title { font-size: 14.5px; color: var(--muted); transition: color 0.15s ease; }
 .pnav:hover .pnav-title { color: var(--accent); }
+
+/* ── syntax highlighting (rouge) ── */
+:root {
+  --hl-comment: #9a988f; --hl-keyword: #5271ff; --hl-string: #3f7d5a; --hl-number: #b3603f;
+  --hl-func: #7a4fd0; --hl-class: #b3603f; --hl-tag: #5271ff; --hl-attr: #7a4fd0;
+  --hl-builtin: #7a4fd0; --hl-op: #6b6962; --hl-punct: #6b6962; --hl-name: var(--text);
+}
+html[data-theme="dark"] {
+  --hl-comment: #6c6a74; --hl-keyword: #8aa0ff; --hl-string: #7fb898; --hl-number: #e0916f;
+  --hl-func: #b9a3ff; --hl-class: #e0916f; --hl-tag: #8aa0ff; --hl-attr: #b9a3ff;
+  --hl-builtin: #b9a3ff; --hl-op: #9b99a3; --hl-punct: #9b99a3; --hl-name: var(--text);
+}
+.highlight .c, .highlight .ch, .highlight .cd, .highlight .cm, .highlight .cp, .highlight .cpf, .highlight .c1, .highlight .cs { color: var(--hl-comment); font-style: italic; }
+.highlight .k, .highlight .kc, .highlight .kd, .highlight .kn, .highlight .kp, .highlight .kr, .highlight .kt, .highlight .kv { color: var(--hl-keyword); }
+.highlight .s, .highlight .sa, .highlight .sb, .highlight .sc, .highlight .dl, .highlight .sd, .highlight .s2, .highlight .se, .highlight .sh, .highlight .si, .highlight .sx, .highlight .sr, .highlight .s1, .highlight .ss { color: var(--hl-string); }
+.highlight .m, .highlight .mb, .highlight .mf, .highlight .mh, .highlight .mi, .highlight .mo, .highlight .il { color: var(--hl-number); }
+.highlight .nf, .highlight .fm { color: var(--hl-func); }
+.highlight .nc, .highlight .nn, .highlight .ne { color: var(--hl-class); }
+.highlight .nt { color: var(--hl-tag); }
+.highlight .na { color: var(--hl-attr); }
+.highlight .nb, .highlight .bp, .highlight .nl { color: var(--hl-builtin); }
+.highlight .o, .highlight .ow { color: var(--hl-op); }
+.highlight .p, .highlight .pi { color: var(--hl-punct); }
+.highlight .nv, .highlight .vc, .highlight .vg, .highlight .vi, .highlight .nd, .highlight .ni, .highlight .no { color: var(--hl-name); }
+.highlight .gd { color: #b3603f; } .highlight .gi { color: #3f7d5a; } .highlight .gh { color: var(--hl-keyword); font-weight: 500; }
+
+/* ── code copy button ── */
+.post-content .highlight { position: relative; }
+.copy-btn { position: absolute; top: 8px; right: 8px; font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 3px 9px; cursor: pointer; opacity: 0; transition: opacity 0.15s ease, color 0.15s ease, border-color 0.15s ease; }
+.post-content .highlight:hover .copy-btn { opacity: 1; }
+.copy-btn:hover, .copy-btn:focus { opacity: 1; color: var(--accent); border-color: var(--accent); outline: none; }
+
+/* ── table of contents ── */
+.toc { margin: 0 0 34px; padding: 16px 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+.toc-title { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+.toc ul { list-style: none; margin: 0; padding: 0; }
+.toc li { margin: 5px 0; line-height: 1.4; }
+.toc li.toc-sub { padding-left: 16px; }
+.toc a { font-size: 14px; color: var(--muted); text-decoration: none; transition: color 0.15s ease; }
+.toc a:hover { color: var(--accent); }
+.post-content h2, .post-content h3 { scroll-margin-top: 24px; }
 
 /* ── comments ── */
 .comments { max-width: 760px; margin: 54px auto 0; padding-top: 30px; border-top: 1px solid var(--border); }
