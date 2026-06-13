@@ -44,12 +44,8 @@ body {
 /* ── header / nav ── */
 .site-header { padding-top: 22px; border-bottom: 1px solid var(--border); }
 .nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-bottom: 16px; }
-.brand { display: flex; align-items: center; gap: 11px; text-decoration: none; }
-.monogram {
-  width: 29px; height: 29px; border-radius: 8px; background: var(--accent); color: var(--bg);
-  font-family: var(--font-serif); font-weight: 700; font-size: 15px;
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-}
+.brand { display: flex; align-items: center; gap: 9px; text-decoration: none; }
+.brand-mark { color: var(--accent); flex-shrink: 0; }
 .brand-name { font-size: 15px; font-weight: 600; color: var(--text); letter-spacing: -0.2px; }
 .nav-links { display: flex; align-items: center; gap: 19px; }
 .nav-links a { position: relative; font-size: 14.5px; color: var(--muted); text-decoration: none; transition: color 0.15s ease; }
