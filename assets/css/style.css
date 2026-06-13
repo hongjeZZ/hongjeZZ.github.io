@@ -29,6 +29,10 @@ html[data-theme="dark"] {
 html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
   font-family: var(--font-sans);
   font-size: 17px;
   line-height: 1.7;
@@ -80,7 +84,8 @@ body {
 html[data-theme="light"] .icon-sun { display: none; }
 html[data-theme="dark"] .icon-moon { display: none; }
 
-main.wrap { padding-bottom: 72px; }
+main.wrap { padding-bottom: 72px; flex: 1 0 auto; }
+.site-footer { flex-shrink: 0; }
 
 /* ── nav search ── */
 .nav-search { position: relative; display: flex; align-items: center; }
@@ -314,12 +319,7 @@ html[data-theme="dark"] { --callout-note: #8aa0ff; --callout-tip: #6cc191; --cal
    categories page — 계층 폴더 트리. 글 행은 사이트 공통 .entry 컴포넌트를 그대로 재사용해
    홈·태그 페이지와 글 간격·폰트·hover를 통일한다. 폴더(serif)만 카테고리 고유 디자인.
    ════════════════════════════════════════════════ */
-.cat-toolbar { display: flex; gap: 8px; margin: 24px 0 10px; }
-.cat-tool-btn { font-family: var(--font-mono); font-size: 12px; color: var(--muted); background: transparent; border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; cursor: pointer; transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease; }
-.cat-tool-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--surface); }
-.cat-tool-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-
-.cat-tree { margin-top: 6px; }
+.cat-tree { margin-top: 24px; }
 .cat-folder { margin: 0; }
 .cat-folder-body { margin-left: 10px; padding-left: 20px; border-left: 1px solid var(--border); }
 .cat-folder:last-child { margin-bottom: 2px; }

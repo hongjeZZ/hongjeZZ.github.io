@@ -16,10 +16,6 @@ description: 글을 카테고리 폴더 구조로 모아 봅니다.
 ]
 </script>
 
-<div class="cat-toolbar">
-  <button type="button" id="cat-expand" class="cat-tool-btn">모두 펼치기</button>
-  <button type="button" id="cat-collapse" class="cat-tool-btn">모두 접기</button>
-</div>
 <div id="cat-tree" class="cat-tree" role="tree" aria-label="카테고리 폴더"></div>
 
 <script>
@@ -107,15 +103,6 @@ description: 글을 카테고리 폴더 구조로 모아 봅니다.
     }
 
     mount.appendChild(renderNode(root, 0));
-
-    // 모두 펼치기 / 접기
-    function setAll(open) {
-      Array.prototype.forEach.call(mount.querySelectorAll('details.cat-folder'), function (d) { d.open = open; });
-    }
-    var ex = document.getElementById('cat-expand');
-    var co = document.getElementById('cat-collapse');
-    if (ex) ex.addEventListener('click', function () { setAll(true); });
-    if (co) co.addEventListener('click', function () { setAll(false); });
   })();
 </script>
 {%- endif -%}
