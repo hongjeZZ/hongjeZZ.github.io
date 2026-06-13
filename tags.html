@@ -15,7 +15,7 @@ description: 글을 태그별로 모아 봅니다.
 </div>
 <div id="tag-posts">
   {%- for tag in tags -%}
-  <section class="tag-group" id="{{ tag[0] | slugify }}" data-tag="{{ tag[0] | slugify }}">
+  <section class="tag-group" id="{{ tag[0] | slugify }}" data-tag="{{ tag[0] | slugify }}" hidden>
     <header class="tag-group-head"><span class="tag-group-name">#{{ tag[0] }}</span><span class="tag-group-count">{{ tag[1] | size }}</span></header>
     <div class="tag-group-list entries">
       {%- for post in tag[1] -%}
@@ -92,19 +92,16 @@ description: 글을 태그별로 모아 봅니다.
     }
     groups.forEach(paginate);
 
-    // ── 칩 = 토글 필터. 선택 없으면 전체 표시, 누른 칩 다시 클릭 시 해제 ──
+    // ── 칩 = 토글 필터. 처음엔 아무것도 선택 안 함(중복 방지). 누른 칩 다시 클릭 시 해제 ──
     var activeSlug = null;
 
-    function showAll() {
+    function clearSelection() {
       activeSlug = null;
       chips.forEach(function (c) {
         c.classList.remove('active');
         c.setAttribute('aria-pressed', 'false');
       });
-      groups.forEach(function (g) {
-        g.hidden = false;
-        if (g._showFirst) g._showFirst();
-      });
+      groups.forEach(function (g) { g.hidden = true; });
       try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
     }
 
@@ -128,18 +125,18 @@ description: 글을 태그별로 모아 봅니다.
 
     chips.forEach(function (c) {
       c.addEventListener('click', function () {
-        if (activeSlug === c.dataset.tag) showAll();
+        if (activeSlug === c.dataset.tag) clearSelection();
         else select(c.dataset.tag);
       });
     });
 
     var hash = '';
     try { hash = decodeURIComponent(location.hash.replace('#', '')).trim(); } catch (e) {}
-    if (!(hash && select(hash))) showAll();
+    if (!(hash && select(hash))) clearSelection();
     window.addEventListener('hashchange', function () {
       var h = '';
       try { h = decodeURIComponent(location.hash.replace('#', '')).trim(); } catch (e) {}
-      if (h) select(h); else showAll();
+      if (h) select(h); else clearSelection();
     });
   })();
 </script>

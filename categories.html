@@ -79,20 +79,28 @@ description: 글을 카테고리 폴더 구조로 모아 봅니다.
         details.appendChild(body);
         frag.appendChild(details);
       });
-      // 그 다음 이 폴더에 직접 속한 글(잎)
+      // 그 다음 이 폴더에 직접 속한 글(잎) — 사이트 공통 .entry 컴포넌트로 통일
       node.posts.forEach(function (p) {
         var a = document.createElement('a');
-        a.className = 'cat-post';
+        a.className = 'entry';
         a.href = p.url;
         a.setAttribute('role', 'treeitem');
-        var t = document.createElement('span');
-        t.className = 'cat-post-title';
-        t.textContent = p.title;
         var d = document.createElement('time');
-        d.className = 'cat-post-date';
+        d.className = 'entry-date';
         d.textContent = p.date;
-        a.appendChild(t);
+        var body = document.createElement('span');
+        body.className = 'entry-body';
+        var t = document.createElement('span');
+        t.className = 'entry-title';
+        t.textContent = p.title;
+        body.appendChild(t);
+        var arrow = document.createElement('span');
+        arrow.className = 'entry-arrow';
+        arrow.setAttribute('aria-hidden', 'true');
+        arrow.textContent = '→';
         a.appendChild(d);
+        a.appendChild(body);
+        a.appendChild(arrow);
         frag.appendChild(a);
       });
       return frag;
