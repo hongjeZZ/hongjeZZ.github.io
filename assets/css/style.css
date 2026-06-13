@@ -38,8 +38,8 @@ body {
   transition: background 0.25s ease, color 0.25s ease;
 }
 .wrap { max-width: 900px; margin: 0 auto; padding: 0 26px; }
-/* 포스트·페이지 본문은 읽기 좋은 폭으로 좁혀 가운데 정렬 (헤더·홈 목록은 넓게) */
-.post, .page { max-width: 760px; margin-left: auto; margin-right: auto; }
+/* 포스트 본문만 읽기 좋은 폭으로 좁혀 가운데 정렬 (헤더·홈·태그·소개는 넓게) */
+.post { max-width: 760px; margin-left: auto; margin-right: auto; }
 
 /* ── header / nav ── */
 .site-header { padding-top: 22px; border-bottom: 1px solid var(--border); }
@@ -74,14 +74,20 @@ html[data-theme="dark"] .icon-moon { display: none; }
 
 main.wrap { padding-bottom: 72px; }
 
-/* ── search ── */
-.search { position: relative; margin: 30px 0 4px; }
-.search-input { width: 100%; box-sizing: border-box; font-family: var(--font-sans); font-size: 15px; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px 12px 44px; transition: border-color 0.15s ease, background 0.15s ease; }
-.search-input::placeholder { color: var(--faint); }
-.search-input:focus { outline: none; border-color: var(--accent); background: var(--bg); }
-.search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--faint); pointer-events: none; display: flex; transition: color 0.15s ease; }
-.search-input:focus ~ .search-icon { color: var(--accent); }
-.search-empty { font-size: 15px; color: var(--muted); padding: 22px 2px; }
+/* ── nav search ── */
+.nav-search { position: relative; display: flex; align-items: center; }
+.nav-search-input { width: 150px; box-sizing: border-box; font-family: var(--font-sans); font-size: 13.5px; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 9px; padding: 7px 12px 7px 32px; transition: width 0.2s ease, border-color 0.15s ease, background 0.15s ease; }
+.nav-search-input::placeholder { color: var(--faint); }
+.nav-search-input:focus { outline: none; border-color: var(--accent); background: var(--bg); width: 210px; }
+.nav-search-icon { position: absolute; left: 11px; color: var(--faint); pointer-events: none; display: flex; transition: color 0.15s ease; }
+.nav-search-input:focus ~ .nav-search-icon { color: var(--accent); }
+.search-dropdown { position: absolute; top: calc(100% + 9px); left: 0; width: 320px; max-width: 78vw; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 6px; box-shadow: 0 10px 30px rgba(20, 20, 30, 0.10); z-index: 60; max-height: 380px; overflow-y: auto; }
+.sd-item { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; padding: 9px 11px; border-radius: 8px; text-decoration: none; }
+.sd-item:hover { background: var(--surface); }
+.sd-title { font-size: 14px; color: var(--text); transition: color 0.15s ease; }
+.sd-item:hover .sd-title { color: var(--accent); }
+.sd-date { font-family: var(--font-mono); font-size: 11.5px; color: var(--faint); white-space: nowrap; }
+.sd-empty { padding: 12px; font-size: 13px; color: var(--muted); }
 .kicker { font-family: var(--font-sans); font-size: 12px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin: 0 0 9px; }
 .hero-sub { font-size: 16px; color: var(--muted); margin: 13px 0 0; }
 
@@ -161,11 +167,12 @@ main.wrap { padding-bottom: 72px; }
 .notfound p { color: var(--muted); }
 .notfound a { color: var(--accent); text-decoration: none; }
 
-@media (max-width: 560px) {
+@media (max-width: 600px) {
   body { font-size: 16px; }
-  .hero-title { font-size: 32px; }
   .post-title { font-size: 27px; }
   .wrap { padding: 0 18px; }
-  .nav-links { gap: 15px; }
+  .nav-links { gap: 13px; }
   .brand-name { display: none; }
+  .nav-search-input { width: 108px; }
+  .nav-search-input:focus { width: 142px; }
 }

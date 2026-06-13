@@ -43,6 +43,11 @@
         <span class="brand-name">{{ site.title }}</span>
       </a>
       <nav class="nav-links">
+        <div class="nav-search">
+          <input id="nav-search" class="nav-search-input" type="search" placeholder="검색" autocomplete="off" aria-label="글 검색">
+          <svg class="nav-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.2-4.2"></path></svg>
+          <div id="nav-search-results" class="search-dropdown" hidden></div>
+        </div>
         <a href="{{ '/' | relative_url }}"{% if page.url == '/' %} class="active"{% endif %}>글</a>
         <a href="{{ '/tags/' | relative_url }}"{% if page.url contains '/tags' %} class="active"{% endif %}>태그</a>
         <a href="{{ '/about/' | relative_url }}"{% if page.url contains '/about' %} class="active"{% endif %}>소개</a>
@@ -75,6 +80,55 @@
         var next = cur === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', next);
         try { localStorage.setItem('theme', next); } catch (e) {}
+      });
+    })();
+
+    (function () {
+      var input = document.getElementById('nav-search');
+      var box = document.getElementById('nav-search-results');
+      if (!input || !box) return;
+      var index = null;
+      function esc(s) {
+        return String(s).replace(/[&<>"]/g, function (c) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+        });
+      }
+      function load() {
+        if (index) return Promise.resolve(index);
+        return fetch('{{ "/search.json" | relative_url }}')
+          .then(function (r) { return r.json(); })
+          .then(function (d) { index = d; return d; });
+      }
+      function render(items) {
+        if (!items.length) {
+          box.innerHTML = '<div class="sd-empty">검색 결과가 없습니다.</div>';
+          return;
+        }
+        box.innerHTML = items.slice(0, 8).map(function (p) {
+          return '<a class="sd-item" href="' + p.url + '">' +
+            '<span class="sd-title">' + esc(p.title) + '</span>' +
+            '<span class="sd-date">' + esc(p.date) + '</span></a>';
+        }).join('');
+      }
+      function run() {
+        var q = input.value.trim();
+        if (!q) { box.hidden = true; box.innerHTML = ''; return; }
+        var lq = q.toLowerCase();
+        load().then(function (data) {
+          var hits = data.filter(function (p) {
+            return (p.title + ' ' + p.tags + ' ' + p.content).toLowerCase().indexOf(lq) !== -1;
+          });
+          render(hits);
+          box.hidden = false;
+        });
+      }
+      input.addEventListener('input', run);
+      input.addEventListener('focus', function () { if (input.value.trim()) box.hidden = false; });
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest('.nav-search')) box.hidden = true;
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') { box.hidden = true; input.blur(); }
       });
     })();
   </script>
