@@ -8,40 +8,51 @@ description: 글을 카테고리별로 모아 봅니다.
 {%- if cats.size == 0 -%}
 <p class="muted-note">아직 카테고리가 없습니다.</p>
 {%- else -%}
-<div class="tag-cloud">
+<p class="cat-intro">주제별 묶음으로 글을 둘러보세요. 카테고리당 처음 6편이 보이고, <span class="cat-intro-em">더 보기</span>로 나머지를 펼칠 수 있습니다.</p>
+<div class="cat-directory">
   {%- for cat in cats -%}
-  <button type="button" class="tag-chip" data-tag="{{ cat[0] | slugify }}">{{ cat[0] }} <span class="tag-chip-count">{{ cat[1] | size }}</span></button>
-  {%- endfor -%}
-</div>
-<div id="tag-posts">
-  {%- for cat in cats -%}
-  <div class="tag-group entries" id="{{ cat[0] | slugify }}" data-tag="{{ cat[0] | slugify }}" hidden>
-    {%- for post in cat[1] -%}
-    <a class="entry" href="{{ post.url | relative_url }}">
-      <time class="entry-date" datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y.%m.%d" }}</time>
-      <span class="entry-body"><span class="entry-title">{{ post.title }}</span></span>
-      <span class="entry-arrow" aria-hidden="true">→</span>
-    </a>
-    {%- endfor -%}
-  </div>
+  {%- assign cat_count = cat[1] | size -%}
+  <section class="cat-section" id="{{ cat[0] | slugify }}">
+    <header class="cat-head">
+      <h2 class="cat-name">{{ cat[0] }}</h2>
+      <span class="cat-badge">{{ cat_count }}편</span>
+    </header>
+    <div class="cat-list entries">
+      {%- for post in cat[1] -%}
+      <a class="entry{% if forloop.index > 6 %} cat-extra{% endif %}" href="{{ post.url | relative_url }}"{% if forloop.index > 6 %} hidden{% endif %}>
+        <time class="entry-date" datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y.%m.%d" }}</time>
+        <span class="entry-body"><span class="entry-title">{{ post.title }}</span></span>
+        <span class="entry-arrow" aria-hidden="true">→</span>
+      </a>
+      {%- endfor -%}
+    </div>
+    {%- if cat_count > 6 -%}
+    <button type="button" class="cat-more" data-remaining="{{ cat_count | minus: 6 }}" aria-expanded="false">더 보기 <span class="cat-more-count">{{ cat_count | minus: 6 }}편</span></button>
+    {%- endif -%}
+  </section>
   {%- endfor -%}
 </div>
 <script>
   (function () {
-    var chips = Array.prototype.slice.call(document.querySelectorAll('.tag-chip'));
-    var groups = Array.prototype.slice.call(document.querySelectorAll('.tag-group'));
-    if (!chips.length) return;
-    function select(slug) {
-      var matched = false;
-      chips.forEach(function (c) { var on = c.dataset.tag === slug; c.classList.toggle('active', on); if (on) matched = true; });
-      groups.forEach(function (g) { g.hidden = g.dataset.tag !== slug; });
-      if (matched) { try { history.replaceState(null, '', '#' + slug); } catch (e) {} }
-      return matched;
-    }
-    chips.forEach(function (c) { c.addEventListener('click', function () { select(c.dataset.tag); }); });
-    var hash = '';
-    try { hash = decodeURIComponent(location.hash.replace('#', '')).trim(); } catch (e) {}
-    if (!select(hash)) { select(chips[0].dataset.tag); }
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.cat-more'));
+    buttons.forEach(function (btn) {
+      var section = btn.closest('.cat-section');
+      if (!section) return;
+      var extras = Array.prototype.slice.call(section.querySelectorAll('.cat-extra'));
+      btn.addEventListener('click', function () {
+        var expanded = btn.getAttribute('aria-expanded') === 'true';
+        if (expanded) {
+          extras.forEach(function (e) { e.hidden = true; });
+          btn.setAttribute('aria-expanded', 'false');
+          btn.firstChild.textContent = '더 보기 ';
+          section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          extras.forEach(function (e) { e.hidden = false; });
+          btn.setAttribute('aria-expanded', 'true');
+          btn.firstChild.textContent = '접기 ';
+        }
+      });
+    });
   })();
 </script>
 {%- endif -%}

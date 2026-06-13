@@ -27,6 +27,51 @@ layout: default
     </div>
     {%- endif -%}
 
+    {%- if page.series -%}
+    {%- assign series_posts = site.posts | where: "series", page.series -%}
+    {%- assign series_posts = series_posts | sort: "date" -%}
+    {%- assign series_posts = series_posts | sort_natural: "series_order" -%}
+    {%- assign series_total = series_posts | size -%}
+    <section class="series" aria-label="시리즈">
+      <div class="series-head">
+        <span class="series-eyebrow">시리즈</span>
+        <h2 class="series-name">{{ page.series }}</h2>
+      </div>
+      <ol class="series-list">
+        {%- assign series_idx = 0 -%}
+        {%- for post in series_posts -%}
+        {%- assign series_idx = series_idx | plus: 1 -%}
+        {%- if post.url == page.url -%}
+        <li class="series-item is-current" aria-current="true">
+          <span class="series-num">{{ series_idx }}</span>
+          <span class="series-item-body">
+            <span class="series-item-title">{{ post.title }}</span>
+          </span>
+          <span class="series-badge">현재</span>
+        </li>
+        {%- else -%}
+        <li class="series-item">
+          <a class="series-link" href="{{ post.url | relative_url }}">
+            <span class="series-num">{{ series_idx }}</span>
+            <span class="series-item-body">
+              <span class="series-item-title">{{ post.title }}</span>
+            </span>
+            <time class="series-date">{{ post.date | date: "%Y.%m.%d" }}</time>
+          </a>
+        </li>
+        {%- endif -%}
+        {%- endfor -%}
+      </ol>
+      {%- assign current_pos = 0 -%}
+      {%- assign series_idx2 = 0 -%}
+      {%- for post in series_posts -%}
+      {%- assign series_idx2 = series_idx2 | plus: 1 -%}
+      {%- if post.url == page.url -%}{%- assign current_pos = series_idx2 -%}{%- endif -%}
+      {%- endfor -%}
+      <p class="series-progress">전체 {{ series_total }}편 중 {{ current_pos }}번째</p>
+    </section>
+    {%- endif -%}
+
     {%- capture related_html -%}{%- assign count = 0 -%}{%- for post in site.posts -%}{%- if post.url != page.url and count < 3 -%}{%- assign common = post.tags | where_exp: "t", "page.tags contains t" -%}{%- if common.size > 0 -%}<a class="entry" href="{{ post.url | relative_url }}"><time class="entry-date">{{ post.date | date: "%Y.%m.%d" }}</time><span class="entry-body"><span class="entry-title">{{ post.title }}</span></span><span class="entry-arrow" aria-hidden="true">→</span></a>{%- assign count = count | plus: 1 -%}{%- endif -%}{%- endif -%}{%- endfor -%}{%- endcapture -%}
     {%- if related_html contains 'class="entry"' -%}
     <section class="related">
@@ -215,6 +260,83 @@ layout: default
       a.href = '#' + h.id; a.setAttribute('aria-label', '이 섹션 링크'); a.textContent = '#';
       h.appendChild(a);
     });
+
+  // 본문 이미지 라이트박스 (클릭하여 확대 · Esc/스크롤/스크림 클릭으로 닫기)
+  (function () {
+    var imgs = content.querySelectorAll('img');
+    if (!imgs.length) return;
+
+    var overlay = null, dialog = null, view = null, closeBtn = null, lastFocus = null;
+
+    function build() {
+      overlay = document.createElement('div');
+      overlay.className = 'lightbox';
+      overlay.setAttribute('role', 'dialog');
+      overlay.setAttribute('aria-modal', 'true');
+      overlay.setAttribute('aria-label', '확대된 이미지');
+
+      view = document.createElement('img');
+      view.alt = '';
+
+      closeBtn = document.createElement('button');
+      closeBtn.type = 'button';
+      closeBtn.className = 'lightbox-close';
+      closeBtn.setAttribute('aria-label', '닫기');
+      closeBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>';
+
+      overlay.appendChild(view);
+      overlay.appendChild(closeBtn);
+      document.body.appendChild(overlay);
+
+      // 스크림 클릭으로 닫기 (이미지 클릭은 통과)
+      overlay.addEventListener('click', function (e) { if (e.target !== view) close(); });
+      closeBtn.addEventListener('click', close);
+    }
+
+    function open(src, alt) {
+      if (!overlay) build();
+      lastFocus = document.activeElement;
+      view.src = src;
+      view.alt = alt || '';
+      document.documentElement.style.overflow = 'hidden';
+      // 다음 프레임에 transition 트리거
+      requestAnimationFrame(function () { overlay.classList.add('show'); });
+      window.addEventListener('keydown', onKey);
+      window.addEventListener('scroll', close, { passive: true, once: true });
+      window.addEventListener('wheel', close, { passive: true, once: true });
+      closeBtn.focus();
+    }
+
+    function close() {
+      if (!overlay || !overlay.classList.contains('show')) return;
+      overlay.classList.remove('show');
+      document.documentElement.style.overflow = '';
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('scroll', close);
+      window.removeEventListener('wheel', close);
+      var done = function () {
+        overlay.style.display = 'none';
+        overlay.style.display = '';
+        view.src = '';
+        if (lastFocus && lastFocus.focus) lastFocus.focus();
+      };
+      var mq = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (mq) { done(); }
+      else { overlay.addEventListener('transitionend', function h() { overlay.removeEventListener('transitionend', h); done(); }); }
+    }
+
+    function onKey(e) {
+      if (e.key === 'Escape') { e.preventDefault(); close(); }
+      else if (e.key === 'Tab') { e.preventDefault(); closeBtn.focus(); }
+    }
+
+    imgs.forEach(function (img) {
+      if (img.closest('a')) return; // 링크로 감싼 이미지는 제외
+      img.addEventListener('click', function () {
+        open(img.currentSrc || img.src, img.alt);
+      });
+    });
+  })();
   })();
 </script>
 
