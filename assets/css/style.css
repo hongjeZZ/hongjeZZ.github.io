@@ -43,7 +43,7 @@ body {
 .post-main { width: 100%; }
 .post-toc { position: absolute; top: 30px; bottom: 0; left: -192px; width: 160px; }
 .post-toc .toc { position: sticky; top: 26px; }
-@media (max-width: 1250px) {
+@media (max-width: 1320px) {
   .post-toc { position: static; top: auto; bottom: auto; left: auto; width: auto; }
   .post-toc .toc { position: static; margin-bottom: 30px; }
 }
@@ -82,13 +82,14 @@ main.wrap { padding-bottom: 72px; }
 .nav-search-input { width: 150px; box-sizing: border-box; font-family: var(--font-sans); font-size: 13.5px; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 9px; padding: 7px 12px 7px 32px; transition: width 0.2s ease, border-color 0.15s ease, background 0.15s ease; }
 .nav-search-input::placeholder { color: var(--faint); }
 .nav-search-input:focus { outline: none; border-color: var(--accent); background: var(--bg); width: 210px; }
+.nav-search-input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .nav-search-icon { position: absolute; left: 11px; color: var(--faint); pointer-events: none; display: flex; transition: color 0.15s ease; }
 .nav-search-input:focus ~ .nav-search-icon { color: var(--accent); }
 .search-dropdown { position: absolute; top: calc(100% + 9px); left: 0; width: 320px; max-width: 78vw; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 6px; box-shadow: 0 10px 30px rgba(20, 20, 30, 0.10); z-index: 60; max-height: 380px; overflow-y: auto; }
 .sd-item { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; padding: 9px 11px; border-radius: 8px; text-decoration: none; }
-.sd-item:hover { background: var(--surface); }
+.sd-item:hover, .sd-item.sd-active { background: var(--surface); }
 .sd-title { font-size: 14px; color: var(--text); transition: color 0.15s ease; }
-.sd-item:hover .sd-title { color: var(--accent); }
+.sd-item:hover .sd-title, .sd-item.sd-active .sd-title { color: var(--accent); }
 .sd-date { font-family: var(--font-mono); font-size: 11.5px; color: var(--faint); white-space: nowrap; }
 .sd-empty { padding: 12px; font-size: 13px; color: var(--muted); }
 
@@ -111,7 +112,7 @@ main.wrap { padding-bottom: 72px; }
 .entry:hover .entry-arrow { opacity: 1; transform: translateX(3px); }
 
 /* ── post detail ── */
-.post-header { margin: 30px 0 32px; }
+.post-header { margin: 0 0 32px; padding-top: 30px; }
 .post-title { font-family: var(--font-serif); font-weight: 700; font-size: 34px; line-height: 1.32; letter-spacing: -0.8px; color: var(--text); margin: 0; }
 .post-meta { display: flex; align-items: baseline; gap: 10px; margin-top: 14px; font-family: var(--font-mono); font-size: 13px; color: var(--faint); }
 .post-meta .dot { color: var(--border); }
@@ -134,7 +135,8 @@ main.wrap { padding-bottom: 72px; }
 .post-content code { font-family: var(--font-mono); font-size: 0.84em; background: var(--code-bg); padding: 2px 6px; border-radius: 5px; color: var(--text); }
 .post-content pre { background: var(--code-bg); padding: 16px 18px; border-radius: 11px; overflow-x: auto; font-size: 14px; line-height: 1.6; margin: 0 0 1.4em; }
 .post-content pre code { background: transparent; padding: 0; font-size: inherit; }
-.post-content table { width: 100%; border-collapse: collapse; margin: 0 0 1.4em; font-size: 15px; }
+.post-content .table-wrap { overflow-x: auto; margin: 0 0 1.4em; }
+.post-content table { width: 100%; border-collapse: collapse; margin: 0; font-size: 15px; }
 .post-content th, .post-content td { padding: 8px 12px; border: 1px solid var(--border); text-align: left; }
 .post-content th { background: var(--surface); font-weight: 600; }
 
@@ -153,12 +155,12 @@ main.wrap { padding-bottom: 72px; }
 :root {
   --hl-comment: #9a988f; --hl-keyword: #5271ff; --hl-string: #3f7d5a; --hl-number: #b3603f;
   --hl-func: #7a4fd0; --hl-class: #b3603f; --hl-tag: #5271ff; --hl-attr: #7a4fd0;
-  --hl-builtin: #7a4fd0; --hl-op: #6b6962; --hl-punct: #6b6962; --hl-name: var(--text);
+  --hl-builtin: #7a4fd0; --hl-op: #6b6962; --hl-punct: #6b6962; --hl-name: var(--text); --hl-deleted: #b3603f; --hl-inserted: #3f7d5a;
 }
 html[data-theme="dark"] {
   --hl-comment: #6c6a74; --hl-keyword: #8aa0ff; --hl-string: #7fb898; --hl-number: #e0916f;
   --hl-func: #b9a3ff; --hl-class: #e0916f; --hl-tag: #8aa0ff; --hl-attr: #b9a3ff;
-  --hl-builtin: #b9a3ff; --hl-op: #9b99a3; --hl-punct: #9b99a3; --hl-name: var(--text);
+  --hl-builtin: #b9a3ff; --hl-op: #9b99a3; --hl-punct: #9b99a3; --hl-name: var(--text); --hl-deleted: #e0916f; --hl-inserted: #7fb898;
 }
 .highlight .c, .highlight .ch, .highlight .cd, .highlight .cm, .highlight .cp, .highlight .cpf, .highlight .c1, .highlight .cs { color: var(--hl-comment); font-style: italic; }
 .highlight .k, .highlight .kc, .highlight .kd, .highlight .kn, .highlight .kp, .highlight .kr, .highlight .kt, .highlight .kv { color: var(--hl-keyword); }
@@ -172,7 +174,7 @@ html[data-theme="dark"] {
 .highlight .o, .highlight .ow { color: var(--hl-op); }
 .highlight .p, .highlight .pi { color: var(--hl-punct); }
 .highlight .nv, .highlight .vc, .highlight .vg, .highlight .vi, .highlight .nd, .highlight .ni, .highlight .no { color: var(--hl-name); }
-.highlight .gd { color: #b3603f; } .highlight .gi { color: #3f7d5a; } .highlight .gh { color: var(--hl-keyword); font-weight: 500; }
+.highlight .gd { color: var(--hl-deleted); } .highlight .gi { color: var(--hl-inserted); } .highlight .gh { color: var(--hl-keyword); font-weight: 500; }
 
 /* ── code copy button ── */
 .post-content .highlight { position: relative; }
@@ -238,12 +240,20 @@ html[data-theme="dark"] {
 .notfound p { color: var(--muted); }
 .notfound a { color: var(--accent); text-decoration: none; }
 
+@media (max-width: 760px) {
+  .brand-name { display: none; }
+  .nav-search-input { width: 130px; }
+  .nav-search-input:focus { width: 150px; }
+}
 @media (max-width: 600px) {
   body { font-size: 16px; }
   .post-title { font-size: 27px; }
   .wrap { padding: 0 18px; }
   .nav-links { gap: 13px; }
-  .brand-name { display: none; }
   .nav-search-input { width: 108px; }
   .nav-search-input:focus { width: 142px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }

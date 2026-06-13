@@ -75,6 +75,19 @@ layout: default
   (function () {
     var content = document.querySelector('.post-content');
     if (!content) return;
+    var heads = content.querySelectorAll('h2, h3');
+
+    // 모든 소제목에 id 보장 (목차 유무와 무관하게 앵커 동작)
+    heads.forEach(function (h, i) { if (!h.id) h.id = 'h-' + i; });
+
+    // 표 가로 스크롤 래퍼 (모바일에서 페이지 전체 가로 스크롤 방지)
+    content.querySelectorAll('table').forEach(function (tb) {
+      if (tb.parentNode && tb.parentNode.classList.contains('table-wrap')) return;
+      var w = document.createElement('div'); w.className = 'table-wrap';
+      tb.parentNode.insertBefore(w, tb); w.appendChild(tb);
+    });
+
+    // 코드 복사 버튼
     content.querySelectorAll('.highlight').forEach(function (block) {
       if (block.closest('.language-mermaid')) return;
       var pre = block.querySelector('pre'); if (!pre) return;
@@ -83,47 +96,58 @@ layout: default
       btn.addEventListener('click', function () {
         var code = block.querySelector('code') || pre;
         var text = code.innerText.replace(/\n+$/, '');
-        if (navigator.clipboard) {
-          navigator.clipboard.writeText(text).then(function () {
-            btn.textContent = '복사됨';
-            setTimeout(function () { btn.textContent = '복사'; }, 1500);
-          });
+        function done(msg) { btn.textContent = msg; setTimeout(function () { btn.textContent = '복사'; }, 1500); }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () { done('복사됨'); }).catch(function () { done('복사 실패'); });
+        } else {
+          try {
+            var ta = document.createElement('textarea'); ta.value = text;
+            ta.style.position = 'fixed'; ta.style.opacity = '0';
+            document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+            document.body.removeChild(ta); done('복사됨');
+          } catch (e) { done('복사 실패'); }
         }
       });
       block.appendChild(btn);
     });
 
-    var heads = content.querySelectorAll('h2, h3');
+    // 목차 (소제목 2개 이상) + 스크롤 스파이
     if (heads.length >= 2) {
       var nav = document.createElement('nav'); nav.className = 'toc';
       var t = document.createElement('div'); t.className = 'toc-title'; t.textContent = '목차';
       var ul = document.createElement('ul');
-      var links = [];
-      heads.forEach(function (h, i) {
-        if (!h.id) h.id = 'h-' + i;
+      var map = {}, ids = [];
+      heads.forEach(function (h) {
         var li = document.createElement('li');
         if (h.tagName === 'H3') li.className = 'toc-sub';
         var a = document.createElement('a'); a.href = '#' + h.id; a.textContent = h.textContent.trim();
-        li.appendChild(a); ul.appendChild(li); links.push({ a: a, id: h.id });
+        li.appendChild(a); ul.appendChild(li); map[h.id] = a; ids.push(h.id);
       });
       nav.appendChild(t); nav.appendChild(ul);
       document.getElementById('toc-mount').appendChild(nav);
+
       if ('IntersectionObserver' in window) {
-        var map = {}; links.forEach(function (l) { map[l.id] = l.a; });
-        var obs = new IntersectionObserver(function (es) {
-          es.forEach(function (e) {
-            if (e.isIntersecting) {
-              links.forEach(function (l) { l.a.classList.remove('active'); });
-              if (map[e.target.id]) map[e.target.id].classList.add('active');
+        var visible = {};
+        function highlight() {
+          var current = null;
+          for (var i = 0; i < ids.length; i++) { if (visible[ids[i]]) { current = ids[i]; break; } }
+          if (!current) {
+            for (var j = ids.length - 1; j >= 0; j--) {
+              if (document.getElementById(ids[j]).getBoundingClientRect().top < 100) { current = ids[j]; break; }
             }
-          });
-        }, { rootMargin: '0px 0px -78% 0px', threshold: 0 });
+          }
+          ids.forEach(function (id) { map[id].classList.toggle('active', id === current); });
+        }
+        var obs = new IntersectionObserver(function (es) {
+          es.forEach(function (e) { visible[e.target.id] = e.isIntersecting; });
+          highlight();
+        }, { rootMargin: '0px 0px -75% 0px', threshold: 0 });
         heads.forEach(function (h) { obs.observe(h); });
       }
     }
 
-    content.querySelectorAll('h2, h3').forEach(function (h) {
-      if (!h.id) return;
+    // 제목 hover 앵커
+    heads.forEach(function (h) {
       var a = document.createElement('a'); a.className = 'heading-anchor';
       a.href = '#' + h.id; a.setAttribute('aria-label', '이 섹션 링크'); a.textContent = '#';
       h.appendChild(a);
@@ -138,12 +162,13 @@ layout: default
   var nodes = [];
   document.querySelectorAll('.language-mermaid').forEach(function (b) {
     var code = b.querySelector('code') || b;
+    var src = code.textContent.trim();
+    if (!src) return;
     var div = document.createElement('div'); div.className = 'mermaid-diagram';
-    div.dataset.src = code.textContent;
+    div.dataset.src = src;
     b.replaceWith(div); nodes.push(div);
   });
   function renderAll() {
-    if (!nodes.length) return;
     mermaid.initialize({ startOnLoad: false, theme: curTheme(), securityLevel: 'strict', fontFamily: "'Pretendard Variable', sans-serif" });
     nodes.forEach(function (div) {
       mermaid.render('mmd-' + (gid++), div.dataset.src)
@@ -151,6 +176,8 @@ layout: default
         .catch(function () { div.textContent = div.dataset.src; });
     });
   }
-  renderAll();
-  window.addEventListener('themechange', renderAll);
+  if (nodes.length) {
+    renderAll();
+    window.addEventListener('themechange', renderAll);
+  }
 </script>
