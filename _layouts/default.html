@@ -4,8 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   {% seo %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
   <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
   {%- feed_meta -%}
   <script>
@@ -24,22 +27,23 @@
 </head>
 <body>
   <header class="site-header">
-    <div class="wrap header-inner">
-      <a class="site-title" href="{{ '/' | relative_url }}">{{ site.title }}</a>
-      <nav class="site-nav">
-        <a href="{{ '/' | relative_url }}">홈</a>
-        <a href="{{ '/tags/' | relative_url }}">태그</a>
-        <a href="{{ '/about/' | relative_url }}">소개</a>
+    <div class="wrap nav">
+      <a class="brand" href="{{ '/' | relative_url }}">
+        <span class="monogram">{{ site.title | slice: 0 | upcase }}</span>
+        <span class="brand-name">{{ site.title }}</span>
+      </a>
+      <nav class="nav-links">
+        <a href="{{ '/' | relative_url }}"{% if page.url == '/' %} class="active"{% endif %}>글</a>
+        <a href="{{ '/tags/' | relative_url }}"{% if page.url contains '/tags' %} class="active"{% endif %}>태그</a>
+        <a href="{{ '/about/' | relative_url }}"{% if page.url contains '/about' %} class="active"{% endif %}>소개</a>
+        <a class="ext" href="https://github.com/{{ site.github_username }}">GitHub</a>
         <button id="theme-toggle" type="button" aria-label="라이트/다크 모드 전환" title="라이트/다크 전환">
-          <svg class="icon-moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
-          <svg class="icon-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.4 1.4M17.6 17.6 19 19M19 5l-1.4 1.4M6.4 17.6 5 19"/></svg>
+          <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
+          <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.4 1.4M17.6 17.6 19 19M19 5l-1.4 1.4M6.4 17.6 5 19"/></svg>
         </button>
       </nav>
     </div>
-    <p class="wrap site-tagline">{{ site.tagline }}</p>
   </header>
-
-  <div class="site-divider"><hr></div>
 
   <main class="wrap">
     {{ content }}
@@ -48,10 +52,7 @@
   <footer class="site-footer">
     <div class="wrap footer-inner">
       <span>© {{ site.time | date: "%Y" }} {{ site.title }}</span>
-      <span>
-        <a href="https://github.com/{{ site.github_username }}">GitHub</a>
-        · <a href="{{ '/feed.xml' | relative_url }}">RSS</a>
-      </span>
+      <span class="colophon">Pretendard · Noto Serif KR · Jekyll</span>
     </div>
   </footer>
 

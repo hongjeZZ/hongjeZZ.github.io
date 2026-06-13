@@ -1,23 +1,23 @@
 ---
-layout: page
+layout: default
 title: 태그
 permalink: /tags/
 ---
+<h1 class="page-title">태그</h1>
 {%- assign tags = site.tags | sort -%}
 {%- if tags.size == 0 -%}
-<p class="post-excerpt">아직 태그가 없습니다.</p>
+<p class="hero-sub">아직 태그가 없습니다.</p>
 {%- else -%}
 {%- for tag in tags -%}
 <section class="tag-section" id="{{ tag[0] | slugify }}">
-  <h2 class="tag-heading">#{{ tag[0] }}</h2>
-  <ul class="post-list compact">
-    {%- for post in tag[1] -%}
-    <li>
-      <time class="post-date">{{ post.date | date: "%Y.%m.%d" }}</time>
-      <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-    </li>
-    {%- endfor -%}
-  </ul>
+  <h2 class="tag-heading"><span class="tag-hash">#</span>{{ tag[0] }}<span class="tag-cnt">{{ tag[1] | size }}</span></h2>
+  {%- for post in tag[1] -%}
+  <a class="entry" href="{{ post.url | relative_url }}">
+    <time class="entry-date" datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%y.%m.%d" }}</time>
+    <span class="entry-body"><span class="entry-title">{{ post.title }}</span></span>
+    <span class="entry-arrow" aria-hidden="true">→</span>
+  </a>
+  {%- endfor -%}
 </section>
 {%- endfor -%}
 {%- endif -%}
