@@ -57,6 +57,7 @@
           <div id="nav-search-results" class="search-dropdown" hidden></div>
         </div>
         <a href="{{ '/' | relative_url }}"{% if page.url == '/' %} class="active"{% endif %}>글</a>
+        <a href="{{ '/categories/' | relative_url }}"{% if page.url contains '/categories' %} class="active"{% endif %}>카테고리</a>
         <a href="{{ '/tags/' | relative_url }}"{% if page.url contains '/tags' %} class="active"{% endif %}>태그</a>
         <a href="{{ '/about/' | relative_url }}"{% if page.url contains '/about' %} class="active"{% endif %}>소개</a>
         <a class="ext" href="https://github.com/{{ site.github_username }}">GitHub</a>

@@ -1,0 +1,46 @@
+---
+layout: default
+title: 카테고리
+permalink: /categories/
+---
+{%- assign cats = site.categories | sort -%}
+{%- if cats.size == 0 -%}
+<p class="muted-note">아직 카테고리가 없습니다.</p>
+{%- else -%}
+<div class="tag-cloud">
+  {%- for cat in cats -%}
+  <button type="button" class="tag-chip" data-tag="{{ cat[0] | slugify }}">{{ cat[0] }} <span class="tag-chip-count">{{ cat[1] | size }}</span></button>
+  {%- endfor -%}
+</div>
+<div id="tag-posts">
+  {%- for cat in cats -%}
+  <div class="tag-group entries" id="{{ cat[0] | slugify }}" data-tag="{{ cat[0] | slugify }}" hidden>
+    {%- for post in cat[1] -%}
+    <a class="entry" href="{{ post.url | relative_url }}">
+      <time class="entry-date" datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y.%m.%d" }}</time>
+      <span class="entry-body"><span class="entry-title">{{ post.title }}</span></span>
+      <span class="entry-arrow" aria-hidden="true">→</span>
+    </a>
+    {%- endfor -%}
+  </div>
+  {%- endfor -%}
+</div>
+<script>
+  (function () {
+    var chips = Array.prototype.slice.call(document.querySelectorAll('.tag-chip'));
+    var groups = Array.prototype.slice.call(document.querySelectorAll('.tag-group'));
+    if (!chips.length) return;
+    function select(slug) {
+      var matched = false;
+      chips.forEach(function (c) { var on = c.dataset.tag === slug; c.classList.toggle('active', on); if (on) matched = true; });
+      groups.forEach(function (g) { g.hidden = g.dataset.tag !== slug; });
+      if (matched) { try { history.replaceState(null, '', '#' + slug); } catch (e) {} }
+      return matched;
+    }
+    chips.forEach(function (c) { c.addEventListener('click', function () { select(c.dataset.tag); }); });
+    var hash = '';
+    try { hash = decodeURIComponent(location.hash.replace('#', '')).trim(); } catch (e) {}
+    if (!select(hash)) { select(chips[0].dataset.tag); }
+  })();
+</script>
+{%- endif -%}

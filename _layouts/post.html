@@ -87,15 +87,56 @@ layout: default
       tb.parentNode.insertBefore(w, tb); w.appendChild(tb);
     });
 
-    // 코드 복사 버튼
-    content.querySelectorAll('.highlight').forEach(function (block) {
-      if (block.closest('.language-mermaid')) return;
-      var pre = block.querySelector('pre'); if (!pre) return;
-      var btn = document.createElement('button');
-      btn.type = 'button'; btn.className = 'copy-btn'; btn.textContent = '복사';
+    // 콜아웃 (Obsidian 스타일: > [!warning] 제목)
+    var CALLOUT_LABEL = { note: '참고', tip: '팁', warning: '주의', danger: '위험', important: '중요' };
+    function calloutType(t) {
+      t = t.toLowerCase();
+      if (t === 'info' || t === 'note') return 'note';
+      if (t === 'tip' || t === 'success' || t === 'hint') return 'tip';
+      if (t === 'warning' || t === 'caution' || t === 'attention') return 'warning';
+      if (t === 'danger' || t === 'error' || t === 'bug') return 'danger';
+      if (t === 'important') return 'important';
+      return null;
+    }
+    content.querySelectorAll('blockquote').forEach(function (bq) {
+      var p = bq.querySelector('p'); if (!p) return;
+      var m = p.innerHTML.match(/^\s*\[!(\w+)\]\s*(.*?)(?:<br\s*\/?>\s*|$)/i);
+      if (!m) return;
+      var type = calloutType(m[1]); if (!type) return;
+      var title = m[2].replace(/<[^>]*>/g, '').trim();
+      p.innerHTML = p.innerHTML.slice(m[0].length);
+      if (!p.textContent.trim() && !p.querySelector('img, a, code')) p.remove();
+      bq.className = 'callout callout-' + type;
+      var head = document.createElement('div'); head.className = 'callout-title';
+      var label = document.createElement('span'); label.textContent = title || CALLOUT_LABEL[type];
+      head.appendChild(label);
+      bq.insertBefore(head, bq.firstChild);
+    });
+
+    // 코드 블록 카드: 파일명·언어 라벨 + 복사 버튼
+    content.querySelectorAll('.highlight').forEach(function (hl) {
+      if (hl.closest('.language-mermaid')) return;
+      var wrap = hl.closest('.highlighter-rouge') || hl.parentNode;
+      if (!wrap || wrap.classList.contains('code-block')) return;
+      var code = hl.querySelector('code') || hl.querySelector('pre');
+      var lang = '';
+      (wrap.className || '').split(/\s+/).forEach(function (c) {
+        if (c.indexOf('language-') === 0 && c !== 'language-plaintext') lang = c.slice(9);
+      });
+      var filename = '';
+      if (code) {
+        var fl = (code.textContent.split('\n')[0] || '');
+        var fm = fl.match(/^\s*(?:\/\/|#|;|--|<!--|\/\*)\s*file:\s*(.+?)\s*(?:-->|\*\/)?\s*$/i);
+        if (fm) { filename = fm[1].trim(); code.innerHTML = code.innerHTML.replace(/^[\s\S]*?\n/, ''); }
+      }
+      var head = document.createElement('div'); head.className = 'code-head';
+      var left = document.createElement('span'); left.className = 'code-file'; left.textContent = filename;
+      var right = document.createElement('span'); right.className = 'code-meta';
+      if (lang) { var lg = document.createElement('span'); lg.className = 'code-lang'; lg.textContent = lang; right.appendChild(lg); }
+      var btn = document.createElement('button'); btn.type = 'button'; btn.className = 'copy-btn'; btn.textContent = '복사';
       btn.addEventListener('click', function () {
-        var code = block.querySelector('code') || pre;
-        var text = code.innerText.replace(/\n+$/, '');
+        var c = hl.querySelector('code') || hl.querySelector('pre');
+        var text = c.innerText.replace(/\n+$/, '');
         function done(msg) { btn.textContent = msg; setTimeout(function () { btn.textContent = '복사'; }, 1500); }
         if (navigator.clipboard && navigator.clipboard.writeText) {
           navigator.clipboard.writeText(text).then(function () { done('복사됨'); }).catch(function () { done('복사 실패'); });
@@ -108,7 +149,10 @@ layout: default
           } catch (e) { done('복사 실패'); }
         }
       });
-      block.appendChild(btn);
+      right.appendChild(btn);
+      head.appendChild(left); head.appendChild(right);
+      wrap.classList.add('code-block');
+      wrap.insertBefore(head, hl);
     });
 
     // 목차 (소제목 2개 이상) + 스크롤 스파이
