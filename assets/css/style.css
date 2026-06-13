@@ -44,16 +44,16 @@ body {
   transition: background 0.25s ease, color 0.25s ease;
 }
 .wrap { max-width: 900px; margin: 0 auto; padding: 0 26px; }
-/* 포스트: 좌측 목차 + 본문 2컬럼. 목차는 '그리드 아이템'에 직접 sticky →
-   그리드 영역이 본문 높이만큼 늘어나 글 끝까지 따라온다. .post 상단 패딩으로 양 컬럼이
-   같은 높이에서 시작 → 목차 첫 줄과 제목이 정렬된다. 사이드 공간이 없는 좁은 화면(<880px)은
-   본문 위로 끼어들지 않도록 목차를 숨긴다. */
-.post { padding-top: 30px; }
-.post-main { min-width: 0; }
+/* 포스트: 본문은 헤더·카테고리·태그와 동일 폭(.wrap 콘텐츠)을 그대로 채운다. 목차는 본문 폭
+   '밖' 좌측 여백에 absolute로 띄우고, 안쪽 #toc-mount를 sticky 처리해 스크롤을 따라오게 한다.
+   부모 .post-toc가 top:30~bottom:0으로 본문 높이만큼 늘어나 sticky 이동 공간을 확보한다.
+   좌측 여백이 부족한 화면(<1280px)에서는 목차를 숨긴다(본문 폭은 항상 헤더와 일치). */
+.post { position: relative; padding-top: 30px; }
+.post-main { width: 100%; }
 .post-toc { display: none; }
-@media (min-width: 880px) {
-  .post { display: grid; grid-template-columns: 150px minmax(0, 1fr); column-gap: 38px; align-items: start; }
-  .post-toc { display: block; position: sticky; top: 26px; align-self: start; max-height: calc(100vh - 52px); overflow-y: auto; }
+@media (min-width: 1280px) {
+  .post-toc { display: block; position: absolute; top: 30px; bottom: 0; left: -186px; width: 160px; }
+  .post-toc #toc-mount { display: block; position: sticky; top: 26px; max-height: calc(100vh - 52px); overflow-y: auto; }
 }
 
 /* ── header / nav ── */
@@ -130,17 +130,17 @@ main.wrap { padding-bottom: 72px; flex: 1 0 auto; width: 100%; }
 .post-meta .dot { color: var(--border); }
 .post-date { font-family: var(--font-mono); font-size: 12.5px; color: var(--faint); }
 
-.post-content { font-size: 16px; line-height: 1.7; }
+.post-content { font-size: 15px; line-height: 1.62; }
 .post-content > *:first-child { margin-top: 0; }
-.post-content h2 { font-family: var(--font-serif); font-weight: 600; font-size: 19px; letter-spacing: -0.3px; line-height: 1.4; margin: 1.7em 0 0.5em; }
+.post-content h2 { font-family: var(--font-serif); font-weight: 600; font-size: 18px; letter-spacing: -0.3px; line-height: 1.4; margin: 1.5em 0 0.45em; }
 .post-content h2::before { content: ''; display: block; width: 24px; height: 2px; background: var(--accent); margin-bottom: 11px; }
-.post-content h3 { font-family: var(--font-serif); font-weight: 600; font-size: 17px; margin: 1.45em 0 0.4em; }
-.post-content p { margin: 0 0 1em; }
+.post-content h3 { font-family: var(--font-serif); font-weight: 600; font-size: 16px; margin: 1.3em 0 0.4em; }
+.post-content p { margin: 0 0 0.9em; }
 .post-content a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--border); transition: border-color 0.15s; }
 .post-content a:hover { border-bottom-color: var(--accent); }
 .post-content ul, .post-content ol { padding-left: 1.3em; margin: 0 0 1em; }
-.post-content li { margin: 0.28em 0; }
-.post-content blockquote { font-family: var(--font-serif); font-size: 16px; color: var(--muted); border-left: 2px solid var(--accent); padding: 3px 0 3px 18px; margin: 1.3em 0; }
+.post-content li { margin: 0.22em 0; }
+.post-content blockquote { font-family: var(--font-serif); font-size: 15px; color: var(--muted); border-left: 2px solid var(--accent); padding: 3px 0 3px 18px; margin: 1.2em 0; }
 .post-content blockquote p:last-child { margin-bottom: 0; }
 .post-content img { max-width: 100%; height: auto; border-radius: 10px; }
 .post-content hr { border: 0; border-top: 1px solid var(--border); margin: 1.8em 0; }
@@ -203,7 +203,7 @@ html[data-theme="dark"] {
 /* ── callout (Obsidian style) ── */
 :root { --callout-note: #3a55e0; --callout-tip: #1f7a47; --callout-warning: #946514; --callout-danger: #b8392f; --callout-important: #6a4cc0; }
 html[data-theme="dark"] { --callout-note: #8aa0ff; --callout-tip: #6cc191; --callout-warning: #e0a94e; --callout-danger: #e87b72; --callout-important: #b39cf0; }
-.post-content blockquote.callout { font-family: var(--font-sans); font-size: 15px; color: var(--text); border-left: 3px solid var(--cc); background: var(--surface); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 1.3em 0; }
+.post-content blockquote.callout { font-family: var(--font-sans); font-size: 14.5px; color: var(--text); border-left: 3px solid var(--cc); background: var(--surface); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 1.2em 0; }
 .callout-note { --cc: var(--callout-note); }
 .callout-tip { --cc: var(--callout-tip); }
 .callout-warning { --cc: var(--callout-warning); }
