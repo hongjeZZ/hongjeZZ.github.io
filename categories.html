@@ -2,56 +2,112 @@
 layout: default
 title: 카테고리
 permalink: /categories/
-description: 글을 카테고리별로 모아 봅니다.
+description: 글을 카테고리 폴더 구조로 모아 봅니다.
 ---
 {%- assign cats = site.categories | sort -%}
 {%- if cats.size == 0 -%}
 <p class="muted-note">아직 카테고리가 없습니다.</p>
 {%- else -%}
-<div class="cat-directory">
-  {%- for cat in cats -%}
-  {%- assign cat_count = cat[1] | size -%}
-  <section class="cat-section" id="{{ cat[0] | slugify }}">
-    <header class="cat-head">
-      <h2 class="cat-name">{{ cat[0] }}</h2>
-      <span class="cat-badge">{{ cat_count }}편</span>
-    </header>
-    <div class="cat-list entries">
-      {%- for post in cat[1] -%}
-      <a class="entry{% if forloop.index > 6 %} cat-extra{% endif %}" href="{{ post.url | relative_url }}"{% if forloop.index > 6 %} hidden{% endif %}>
-        <time class="entry-date" datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y.%m.%d" }}</time>
-        <span class="entry-body"><span class="entry-title">{{ post.title }}</span></span>
-        <span class="entry-arrow" aria-hidden="true">→</span>
-      </a>
-      {%- endfor -%}
-    </div>
-    {%- if cat_count > 6 -%}
-    <button type="button" class="cat-more" data-remaining="{{ cat_count | minus: 6 }}" aria-expanded="false">더 보기 <span class="cat-more-count">{{ cat_count | minus: 6 }}편</span></button>
-    {%- endif -%}
-  </section>
-  {%- endfor -%}
+<script id="cat-data" type="application/json">
+[
+{%- for post in site.posts -%}
+{"title": {{ post.title | jsonify }}, "url": {{ post.url | relative_url | jsonify }}, "date": {{ post.date | date: "%Y.%m.%d" | jsonify }}, "cats": [{% for c in post.categories %}{{ c | jsonify }}{% unless forloop.last %}, {% endunless %}{% endfor %}]}{% unless forloop.last %},{% endunless %}
+{%- endfor -%}
+]
+</script>
+
+<div class="cat-toolbar">
+  <button type="button" id="cat-expand" class="cat-tool-btn">모두 펼치기</button>
+  <button type="button" id="cat-collapse" class="cat-tool-btn">모두 접기</button>
 </div>
+<div id="cat-tree" class="cat-tree" role="tree" aria-label="카테고리 폴더"></div>
+
 <script>
   (function () {
-    var buttons = Array.prototype.slice.call(document.querySelectorAll('.cat-more'));
-    buttons.forEach(function (btn) {
-      var section = btn.closest('.cat-section');
-      if (!section) return;
-      var extras = Array.prototype.slice.call(section.querySelectorAll('.cat-extra'));
-      btn.addEventListener('click', function () {
-        var expanded = btn.getAttribute('aria-expanded') === 'true';
-        if (expanded) {
-          extras.forEach(function (e) { e.hidden = true; });
-          btn.setAttribute('aria-expanded', 'false');
-          btn.firstChild.textContent = '더 보기 ';
-          section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        } else {
-          extras.forEach(function (e) { e.hidden = false; });
-          btn.setAttribute('aria-expanded', 'true');
-          btn.firstChild.textContent = '접기 ';
+    var el = document.getElementById('cat-data');
+    var mount = document.getElementById('cat-tree');
+    if (!el || !mount) return;
+    var posts;
+    try { posts = JSON.parse(el.textContent); } catch (e) { return; }
+
+    // 각 글의 categories 배열을 경로로 삼아 트리 구성 (글은 가장 깊은 카테고리의 잎)
+    var root = { children: {}, order: [], posts: [] };
+    posts.forEach(function (p) {
+      var node = root;
+      var path = (p.cats && p.cats.length) ? p.cats : ['미분류'];
+      path.forEach(function (c) {
+        if (!node.children[c]) {
+          node.children[c] = { children: {}, order: [], posts: [], name: c };
+          node.order.push(c);
         }
+        node = node.children[c];
       });
+      node.posts.push(p);
     });
+
+    function countPosts(node) {
+      var n = node.posts.length;
+      node.order.forEach(function (k) { n += countPosts(node.children[k]); });
+      return n;
+    }
+
+    function renderNode(node, depth) {
+      var frag = document.createDocumentFragment();
+      // 하위 폴더 먼저
+      node.order.sort().forEach(function (key) {
+        var child = node.children[key];
+        var details = document.createElement('details');
+        details.className = 'cat-folder';
+        details.open = depth < 1; // 최상위만 기본 펼침
+        details.setAttribute('role', 'treeitem');
+
+        var summary = document.createElement('summary');
+        summary.className = 'cat-folder-label';
+        var name = document.createElement('span');
+        name.className = 'cat-folder-name';
+        name.textContent = key;
+        var count = document.createElement('span');
+        count.className = 'cat-folder-count';
+        count.textContent = countPosts(child);
+        summary.appendChild(name);
+        summary.appendChild(count);
+        details.appendChild(summary);
+
+        var body = document.createElement('div');
+        body.className = 'cat-folder-body';
+        body.appendChild(renderNode(child, depth + 1));
+        details.appendChild(body);
+        frag.appendChild(details);
+      });
+      // 그 다음 이 폴더에 직접 속한 글(잎)
+      node.posts.forEach(function (p) {
+        var a = document.createElement('a');
+        a.className = 'cat-post';
+        a.href = p.url;
+        a.setAttribute('role', 'treeitem');
+        var t = document.createElement('span');
+        t.className = 'cat-post-title';
+        t.textContent = p.title;
+        var d = document.createElement('time');
+        d.className = 'cat-post-date';
+        d.textContent = p.date;
+        a.appendChild(t);
+        a.appendChild(d);
+        frag.appendChild(a);
+      });
+      return frag;
+    }
+
+    mount.appendChild(renderNode(root, 0));
+
+    // 모두 펼치기 / 접기
+    function setAll(open) {
+      Array.prototype.forEach.call(mount.querySelectorAll('details.cat-folder'), function (d) { d.open = open; });
+    }
+    var ex = document.getElementById('cat-expand');
+    var co = document.getElementById('cat-collapse');
+    if (ex) ex.addEventListener('click', function () { setAll(true); });
+    if (co) co.addEventListener('click', function () { setAll(false); });
   })();
 </script>
 {%- endif -%}

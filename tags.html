@@ -16,7 +16,7 @@ description: 글을 태그별로 모아 봅니다.
 <div id="tag-posts">
   {%- for tag in tags -%}
   <section class="tag-group" id="{{ tag[0] | slugify }}" data-tag="{{ tag[0] | slugify }}">
-    <header class="tag-group-head"><span class="tag-group-name">#{{ tag[0] }}</span><span class="tag-group-count">{{ tag[1] | size }}편</span></header>
+    <header class="tag-group-head"><span class="tag-group-name">#{{ tag[0] }}</span><span class="tag-group-count">{{ tag[1] | size }}</span></header>
     <div class="tag-group-list entries">
       {%- for post in tag[1] -%}
       <a class="entry" href="{{ post.url | relative_url }}">
