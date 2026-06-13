@@ -40,14 +40,16 @@ body {
   transition: background 0.25s ease, color 0.25s ease;
 }
 .wrap { max-width: 900px; margin: 0 auto; padding: 0 26px; }
-/* 포스트: 본문은 다른 페이지와 동일 폭(900), 목차는 본문 바깥 좌측 여백에 부유(sticky) */
-.post { position: relative; }
-.post-main { width: 100%; }
-.post-toc { position: absolute; top: 30px; bottom: 0; left: -192px; width: 160px; }
-.post-toc .toc { position: sticky; top: 26px; }
-@media (max-width: 1320px) {
-  .post-toc { position: static; top: auto; bottom: auto; left: auto; width: auto; }
-  .post-toc .toc { position: static; margin-bottom: 30px; }
+/* 포스트: 좌측 목차 + 본문 2컬럼. 목차는 '그리드 아이템'에 직접 sticky →
+   그리드 영역이 본문 높이만큼 늘어나므로 글 끝까지 스크롤을 따라온다.
+   좁은 화면(<1000px)에서는 본문 위에 정적으로 펼친다. */
+.wrap-post { max-width: 1040px; }
+.post-main { min-width: 0; }
+.post-toc { margin-bottom: 26px; }
+.post-toc .toc { position: static; }
+@media (min-width: 1000px) {
+  .post { display: grid; grid-template-columns: 172px minmax(0, 1fr); column-gap: 46px; align-items: start; }
+  .post-toc { position: sticky; top: 26px; align-self: start; max-height: calc(100vh - 52px); overflow-y: auto; margin-bottom: 0; }
 }
 
 /* ── header / nav ── */

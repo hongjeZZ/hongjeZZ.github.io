@@ -69,7 +69,7 @@
     </div>
   </header>
 
-  <main class="wrap">
+  <main class="wrap{% if page.layout == 'post' %} wrap-post{% endif %}">
     {{ content }}
   </main>
 
