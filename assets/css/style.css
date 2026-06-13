@@ -147,6 +147,10 @@ main.wrap { padding-bottom: 72px; }
 .pnav-title { font-size: 14.5px; color: var(--muted); transition: color 0.15s ease; }
 .pnav:hover .pnav-title { color: var(--accent); }
 
+/* ── comments ── */
+.comments { max-width: 760px; margin: 54px auto 0; padding-top: 30px; border-top: 1px solid var(--border); }
+.comments-title { font-family: var(--font-serif); font-weight: 600; font-size: 20px; letter-spacing: -0.3px; margin: 0 0 18px; }
+
 /* ── pages / tags ── */
 .page-title { font-family: var(--font-serif); font-weight: 700; font-size: 30px; letter-spacing: -0.5px; margin: 30px 0 24px; }
 .tag-section { margin: 0 0 30px; scroll-margin-top: 24px; }

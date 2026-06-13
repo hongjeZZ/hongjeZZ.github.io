@@ -38,4 +38,36 @@ layout: default
     {%- endif -%}
   </nav>
   {%- endif -%}
+
+  <section class="comments">
+    <h2 class="comments-title">댓글</h2>
+    <div id="giscus"></div>
+  </section>
+  <script>
+    (function () {
+      var mount = document.getElementById('giscus');
+      if (!mount) return;
+      var theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'noborder_dark' : 'noborder_light';
+      var s = document.createElement('script');
+      s.src = 'https://giscus.app/client.js';
+      var attrs = {
+        'data-repo': 'hongjeZZ/hongjeZZ.github.io',
+        'data-repo-id': 'R_kgDOS5X_3g',
+        'data-category': 'Announcements',
+        'data-category-id': 'DIC_kwDOS5X_3s4C_EVw',
+        'data-mapping': 'pathname',
+        'data-strict': '0',
+        'data-reactions-enabled': '1',
+        'data-emit-metadata': '0',
+        'data-input-position': 'bottom',
+        'data-theme': theme,
+        'data-lang': 'ko',
+        'data-loading': 'lazy'
+      };
+      Object.keys(attrs).forEach(function (k) { s.setAttribute(k, attrs[k]); });
+      s.crossOrigin = 'anonymous';
+      s.async = true;
+      mount.appendChild(s);
+    })();
+  </script>
 </article>
