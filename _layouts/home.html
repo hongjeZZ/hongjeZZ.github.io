@@ -1,14 +1,15 @@
 ---
 layout: default
 ---
-<section class="hero">
-  <p class="kicker">BACKEND · INFRA</p>
-  <h1 class="hero-title">공부한 것을 <span class="ink">기록</span>합니다</h1>
-  <p class="hero-sub">{{ site.tagline }}</p>
-</section>
+<div class="search">
+  <input id="search-input" class="search-input" type="search" placeholder="글 검색…" autocomplete="off" aria-label="글 검색">
+  <svg class="search-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.2-4.2"></path></svg>
+</div>
 
-{%- assign by_year = site.posts | group_by_exp: "post", "post.date | date: '%Y'" -%}
-<div class="entries">
+<div id="search-results" class="entries" hidden></div>
+
+<div id="post-list" class="entries">
+  {%- assign by_year = site.posts | group_by_exp: "post", "post.date | date: '%Y'" -%}
   {%- for year in by_year -%}
   <div class="year-head">
     <span class="year-num{% unless forloop.first %} past{% endunless %}">{{ year.name }}</span>
@@ -29,3 +30,51 @@ layout: default
   {%- endfor -%}
   {%- endfor -%}
 </div>
+
+<script>
+  (function () {
+    var input = document.getElementById('search-input');
+    var results = document.getElementById('search-results');
+    var list = document.getElementById('post-list');
+    if (!input || !results || !list) return;
+    var index = null;
+
+    function esc(s) {
+      return String(s).replace(/[&<>"]/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+      });
+    }
+    function load() {
+      if (index) return Promise.resolve(index);
+      return fetch('{{ "/search.json" | relative_url }}')
+        .then(function (r) { return r.json(); })
+        .then(function (d) { index = d; return d; });
+    }
+    function render(items, q) {
+      if (!items.length) {
+        results.innerHTML = '<p class="search-empty">‘' + esc(q) + '’ 검색 결과가 없습니다.</p>';
+        return;
+      }
+      results.innerHTML = items.map(function (p) {
+        return '<a class="entry" href="' + p.url + '">' +
+          '<time class="entry-date">' + esc(p.date) + '</time>' +
+          '<span class="entry-body"><span class="entry-title">' + esc(p.title) + '</span></span>' +
+          '<span class="entry-arrow" aria-hidden="true">→</span></a>';
+      }).join('');
+    }
+    function run() {
+      var q = input.value.trim();
+      if (!q) { results.hidden = true; results.innerHTML = ''; list.hidden = false; return; }
+      var lq = q.toLowerCase();
+      load().then(function (data) {
+        var hits = data.filter(function (p) {
+          return (p.title + ' ' + p.tags + ' ' + p.content).toLowerCase().indexOf(lq) !== -1;
+        });
+        render(hits, q);
+        results.hidden = false;
+        list.hidden = true;
+      });
+    }
+    input.addEventListener('input', run);
+  })();
+</script>
