@@ -102,18 +102,33 @@ layout: default
       var p = bq.querySelector('p'); if (!p) return;
       var fn = p.firstChild;
       if (!fn || fn.nodeType !== 3) return;
-      var m = fn.nodeValue.match(/^\s*\[!(\w+)\]\s*([^\n]*)/);
-      if (!m) return;
-      var type = calloutType(m[1]); if (!type) return;
-      var title = m[2].trim();
-      fn.nodeValue = fn.nodeValue.slice(m[0].length).replace(/^\n/, '');
-      var sib = fn.nextSibling;
-      if (sib && sib.nodeName === 'BR') sib.parentNode.removeChild(sib);
-      if (!p.textContent.trim() && !p.querySelector('img, a, code, strong, em')) p.parentNode.removeChild(p);
+      var mk = fn.nodeValue.match(/^\s*\[!(\w+)\]\s?/);
+      if (!mk) return;
+      var type = calloutType(mk[1]); if (!type) return;
       bq.className = 'callout callout-' + type;
+      bq.setAttribute('role', 'note');
       var head = document.createElement('div'); head.className = 'callout-title';
-      var label = document.createElement('span'); label.textContent = title || CALLOUT_LABEL[type];
-      head.appendChild(label);
+      fn.nodeValue = fn.nodeValue.slice(mk[0].length);
+      // 제목 줄(첫 줄)의 노드들을 제목바로 이동 — 인라인 서식 보존
+      var node = p.firstChild;
+      while (node) {
+        if (node.nodeType === 3) {
+          var nl = node.nodeValue.indexOf('\n');
+          if (nl !== -1) {
+            var t = node.nodeValue.slice(0, nl);
+            node.nodeValue = node.nodeValue.slice(nl + 1);
+            if (t) head.appendChild(document.createTextNode(t));
+            break;
+          }
+          var nx1 = node.nextSibling; head.appendChild(node); node = nx1;
+        } else if (node.nodeName === 'BR') {
+          var nb = node.nextSibling; node.parentNode.removeChild(node); break;
+        } else {
+          var nx2 = node.nextSibling; head.appendChild(node); node = nx2;
+        }
+      }
+      if (!head.textContent.trim()) head.textContent = CALLOUT_LABEL[type];
+      if (p.parentNode && !p.textContent.trim() && !p.querySelector('img, a, code, strong, em')) p.parentNode.removeChild(p);
       bq.insertBefore(head, bq.firstChild);
     });
 
@@ -204,9 +219,6 @@ layout: default
 </script>
 
 <script type="module">
-  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-  var gid = 0;
-  function curTheme() { return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'neutral'; }
   var nodes = [];
   document.querySelectorAll('.language-mermaid').forEach(function (b) {
     var code = b.querySelector('code') || b;
@@ -216,16 +228,20 @@ layout: default
     div.dataset.src = src;
     b.replaceWith(div); nodes.push(div);
   });
-  function renderAll() {
-    mermaid.initialize({ startOnLoad: false, theme: curTheme(), securityLevel: 'strict', fontFamily: "'Pretendard Variable', sans-serif" });
-    nodes.forEach(function (div) {
-      mermaid.render('mmd-' + (gid++), div.dataset.src)
-        .then(function (r) { div.innerHTML = r.svg; })
-        .catch(function () { div.textContent = div.dataset.src; });
-    });
-  }
   if (nodes.length) {
-    renderAll();
-    window.addEventListener('themechange', renderAll);
+    import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs').then(function (mod) {
+      var mermaid = mod.default, gid = 0;
+      function curTheme() { return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'neutral'; }
+      function renderAll() {
+        mermaid.initialize({ startOnLoad: false, theme: curTheme(), securityLevel: 'strict', fontFamily: "'Pretendard Variable', sans-serif" });
+        nodes.forEach(function (div) {
+          mermaid.render('mmd-' + (gid++), div.dataset.src)
+            .then(function (r) { div.innerHTML = r.svg; })
+            .catch(function () { div.textContent = div.dataset.src; });
+        });
+      }
+      renderAll();
+      window.addEventListener('themechange', renderAll);
+    });
   }
 </script>

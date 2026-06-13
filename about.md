@@ -2,6 +2,7 @@
 layout: page
 title: 소개
 permalink: /about/
+description: 백엔드·인프라를 공부하며 기록하는 hongjeZZ의 개발 블로그 소개.
 ---
 
 백엔드와 인프라를 다루며 공부한 것을 정리합니다.
