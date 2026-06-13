@@ -2,86 +2,86 @@
 layout: default
 ---
 <article class="post">
-  <header class="post-header">
-    {%- if page.tags.size > 0 -%}
-    <p class="kicker post-kicker">{% for t in page.tags %}{{ t }}{% unless forloop.last %} · {% endunless %}{% endfor %}</p>
-    {%- endif -%}
-    <h1 class="post-title">{{ page.title }}</h1>
-    {%- assign chars = content | strip_html | size -%}
-    {%- assign minutes = chars | divided_by: 500 | plus: 1 -%}
-    <div class="post-meta">
-      <time class="post-date" datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%Y년 %-m월 %-d일" }}</time>
-      <span class="dot">·</span>
-      <span>약 {{ minutes }}분</span>
+  <div class="post-layout">
+    <aside class="post-aside"><div id="toc-mount"></div></aside>
+    <div class="post-main">
+      <header class="post-header">
+        {%- if page.tags.size > 0 -%}
+        <p class="kicker post-kicker">{% for t in page.tags %}{{ t }}{% unless forloop.last %} · {% endunless %}{% endfor %}</p>
+        {%- endif -%}
+        <h1 class="post-title">{{ page.title }}</h1>
+        {%- assign chars = content | strip_html | size -%}
+        {%- assign minutes = chars | divided_by: 500 | plus: 1 -%}
+        <div class="post-meta">
+          <time class="post-date" datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%Y년 %-m월 %-d일" }}</time>
+          <span class="dot">·</span>
+          <span>약 {{ minutes }}분</span>
+        </div>
+      </header>
+
+      <div class="post-content">
+        {{ content }}
+      </div>
+
+      {%- if page.tags.size > 0 -%}
+      <div class="post-tags">
+        {%- for t in page.tags -%}
+        <a class="tag-pin" href="{{ '/tags/' | relative_url }}#{{ t | slugify }}">#{{ t }}</a>
+        {%- endfor -%}
+      </div>
+      {%- endif -%}
+
+      {%- capture related_html -%}{%- assign count = 0 -%}{%- for post in site.posts -%}{%- if post.url != page.url and count < 3 -%}{%- assign common = post.tags | where_exp: "t", "page.tags contains t" -%}{%- if common.size > 0 -%}<a class="entry" href="{{ post.url | relative_url }}"><time class="entry-date">{{ post.date | date: "%Y.%m.%d" }}</time><span class="entry-body"><span class="entry-title">{{ post.title }}</span></span><span class="entry-arrow" aria-hidden="true">→</span></a>{%- assign count = count | plus: 1 -%}{%- endif -%}{%- endif -%}{%- endfor -%}{%- endcapture -%}
+      {%- if related_html contains 'class="entry"' -%}
+      <section class="related">
+        <h2 class="related-title">관련 글</h2>
+        <div class="entries">{{ related_html }}</div>
+      </section>
+      {%- endif -%}
+
+      {%- if page.previous or page.next -%}
+      <nav class="post-nav">
+        {%- if page.previous -%}
+        <a class="pnav prev" href="{{ page.previous.url | relative_url }}"><span class="pnav-dir">← 이전 글</span><span class="pnav-title">{{ page.previous.title }}</span></a>
+        {%- endif -%}
+        {%- if page.next -%}
+        <a class="pnav next" href="{{ page.next.url | relative_url }}"><span class="pnav-dir">다음 글 →</span><span class="pnav-title">{{ page.next.title }}</span></a>
+        {%- endif -%}
+      </nav>
+      {%- endif -%}
+
+      <section class="comments">
+        <h2 class="comments-title">댓글</h2>
+        <div id="giscus"></div>
+      </section>
     </div>
-  </header>
-
-  <div class="post-content">
-    {{ content }}
   </div>
-
-  {%- if page.tags.size > 0 -%}
-  <div class="post-tags">
-    {%- for t in page.tags -%}
-    <a class="tag-pin" href="{{ '/tags/' | relative_url }}#{{ t | slugify }}">#{{ t }}</a>
-    {%- endfor -%}
-  </div>
-  {%- endif -%}
-
-  {%- if page.previous or page.next -%}
-  <nav class="post-nav">
-    {%- if page.previous -%}
-    <a class="pnav prev" href="{{ page.previous.url | relative_url }}">
-      <span class="pnav-dir">← 이전 글</span>
-      <span class="pnav-title">{{ page.previous.title }}</span>
-    </a>
-    {%- endif -%}
-    {%- if page.next -%}
-    <a class="pnav next" href="{{ page.next.url | relative_url }}">
-      <span class="pnav-dir">다음 글 →</span>
-      <span class="pnav-title">{{ page.next.title }}</span>
-    </a>
-    {%- endif -%}
-  </nav>
-  {%- endif -%}
-
-  <section class="comments">
-    <h2 class="comments-title">댓글</h2>
-    <div id="giscus"></div>
-  </section>
-  <script>
-    (function () {
-      var mount = document.getElementById('giscus');
-      if (!mount) return;
-      var theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'noborder_dark' : 'noborder_light';
-      var s = document.createElement('script');
-      s.src = 'https://giscus.app/client.js';
-      var attrs = {
-        'data-repo': 'hongjeZZ/hongjeZZ.github.io',
-        'data-repo-id': 'R_kgDOS5X_3g',
-        'data-category': 'Announcements',
-        'data-category-id': 'DIC_kwDOS5X_3s4C_EVw',
-        'data-mapping': 'pathname',
-        'data-strict': '0',
-        'data-reactions-enabled': '1',
-        'data-emit-metadata': '0',
-        'data-input-position': 'bottom',
-        'data-theme': theme,
-        'data-lang': 'ko',
-        'data-loading': 'lazy'
-      };
-      Object.keys(attrs).forEach(function (k) { s.setAttribute(k, attrs[k]); });
-      s.crossOrigin = 'anonymous';
-      s.async = true;
-      mount.appendChild(s);
-    })();
-  </script>
 </article>
+
 <script>
+  (function () {
+    var mount = document.getElementById('giscus');
+    if (!mount) return;
+    var theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'noborder_dark' : 'noborder_light';
+    var s = document.createElement('script');
+    s.src = 'https://giscus.app/client.js';
+    var attrs = {
+      'data-repo': 'hongjeZZ/hongjeZZ.github.io', 'data-repo-id': 'R_kgDOS5X_3g',
+      'data-category': 'Announcements', 'data-category-id': 'DIC_kwDOS5X_3s4C_EVw',
+      'data-mapping': 'pathname', 'data-strict': '0', 'data-reactions-enabled': '1',
+      'data-emit-metadata': '0', 'data-input-position': 'bottom', 'data-theme': theme,
+      'data-lang': 'ko', 'data-loading': 'lazy'
+    };
+    Object.keys(attrs).forEach(function (k) { s.setAttribute(k, attrs[k]); });
+    s.crossOrigin = 'anonymous'; s.async = true;
+    mount.appendChild(s);
+  })();
+
   (function () {
     var content = document.querySelector('.post-content');
     if (!content) return;
     content.querySelectorAll('.highlight').forEach(function (block) {
+      if (block.closest('.language-mermaid')) return;
       var pre = block.querySelector('pre'); if (!pre) return;
       var btn = document.createElement('button');
       btn.type = 'button'; btn.className = 'copy-btn'; btn.textContent = '복사';
@@ -97,20 +97,66 @@ layout: default
       });
       block.appendChild(btn);
     });
+
     var heads = content.querySelectorAll('h2, h3');
     if (heads.length >= 2) {
       var nav = document.createElement('nav'); nav.className = 'toc';
       var t = document.createElement('div'); t.className = 'toc-title'; t.textContent = '목차';
       var ul = document.createElement('ul');
+      var links = [];
       heads.forEach(function (h, i) {
         if (!h.id) h.id = 'h-' + i;
         var li = document.createElement('li');
         if (h.tagName === 'H3') li.className = 'toc-sub';
-        var a = document.createElement('a'); a.href = '#' + h.id; a.textContent = h.textContent;
-        li.appendChild(a); ul.appendChild(li);
+        var a = document.createElement('a'); a.href = '#' + h.id; a.textContent = h.textContent.trim();
+        li.appendChild(a); ul.appendChild(li); links.push({ a: a, id: h.id });
       });
       nav.appendChild(t); nav.appendChild(ul);
-      content.parentNode.insertBefore(nav, content);
+      document.getElementById('toc-mount').appendChild(nav);
+      document.querySelector('.post-layout').classList.add('has-toc');
+      if ('IntersectionObserver' in window) {
+        var map = {}; links.forEach(function (l) { map[l.id] = l.a; });
+        var obs = new IntersectionObserver(function (es) {
+          es.forEach(function (e) {
+            if (e.isIntersecting) {
+              links.forEach(function (l) { l.a.classList.remove('active'); });
+              if (map[e.target.id]) map[e.target.id].classList.add('active');
+            }
+          });
+        }, { rootMargin: '0px 0px -78% 0px', threshold: 0 });
+        heads.forEach(function (h) { obs.observe(h); });
+      }
     }
+
+    content.querySelectorAll('h2, h3').forEach(function (h) {
+      if (!h.id) return;
+      var a = document.createElement('a'); a.className = 'heading-anchor';
+      a.href = '#' + h.id; a.setAttribute('aria-label', '이 섹션 링크'); a.textContent = '#';
+      h.appendChild(a);
+    });
   })();
+</script>
+
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  var gid = 0;
+  function curTheme() { return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'neutral'; }
+  var nodes = [];
+  document.querySelectorAll('.language-mermaid').forEach(function (b) {
+    var code = b.querySelector('code') || b;
+    var div = document.createElement('div'); div.className = 'mermaid-diagram';
+    div.dataset.src = code.textContent;
+    b.replaceWith(div); nodes.push(div);
+  });
+  function renderAll() {
+    if (!nodes.length) return;
+    mermaid.initialize({ startOnLoad: false, theme: curTheme(), securityLevel: 'strict', fontFamily: "'Pretendard Variable', sans-serif" });
+    nodes.forEach(function (div) {
+      mermaid.render('mmd-' + (gid++), div.dataset.src)
+        .then(function (r) { div.innerHTML = r.svg; })
+        .catch(function () { div.textContent = div.dataset.src; });
+    });
+  }
+  renderAll();
+  window.addEventListener('themechange', renderAll);
 </script>

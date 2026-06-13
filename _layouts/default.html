@@ -77,7 +77,17 @@
     </div>
   </footer>
 
+  <button class="to-top" type="button" aria-label="맨 위로">↑</button>
+
   <script>
+    (function () {
+      var t = document.querySelector('.to-top');
+      if (t) {
+        t.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+        window.addEventListener('scroll', function () { t.classList.toggle('show', window.scrollY > 600); }, { passive: true });
+      }
+    })();
+
     (function () {
       var btn = document.getElementById('theme-toggle');
       if (!btn) return;
@@ -93,6 +103,7 @@
             'https://giscus.app'
           );
         }
+        window.dispatchEvent(new Event('themechange'));
       });
     })();
 
