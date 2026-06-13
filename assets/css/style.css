@@ -38,14 +38,14 @@ body {
   transition: background 0.25s ease, color 0.25s ease;
 }
 .wrap { max-width: 900px; margin: 0 auto; padding: 0 26px; }
-/* 포스트 레이아웃: 폭은 다른 페이지와 동일(900), 목차가 있으면 좌측 사이드바 2단 */
-.post-layout { display: block; }
-.post-layout.has-toc { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 44px; align-items: start; }
-.post-aside { display: none; }
-.post-layout.has-toc .post-aside { display: block; position: sticky; top: 26px; }
-@media (max-width: 880px) {
-  .post-layout.has-toc { display: block; }
-  .post-layout.has-toc .post-aside { position: static; margin-bottom: 28px; }
+/* 포스트: 본문은 다른 페이지와 동일 폭(900), 목차는 본문 바깥 좌측 여백에 부유(sticky) */
+.post { position: relative; }
+.post-main { width: 100%; }
+.post-toc { position: absolute; top: 30px; bottom: 0; left: -192px; width: 160px; }
+.post-toc .toc { position: sticky; top: 26px; }
+@media (max-width: 1250px) {
+  .post-toc { position: static; top: auto; bottom: auto; left: auto; width: auto; }
+  .post-toc .toc { position: static; margin-bottom: 30px; }
 }
 
 /* ── header / nav ── */
@@ -91,8 +91,6 @@ main.wrap { padding-bottom: 72px; }
 .sd-item:hover .sd-title { color: var(--accent); }
 .sd-date { font-family: var(--font-mono); font-size: 11.5px; color: var(--faint); white-space: nowrap; }
 .sd-empty { padding: 12px; font-size: 13px; color: var(--muted); }
-.kicker { font-family: var(--font-sans); font-size: 12px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin: 0 0 9px; }
-.hero-sub { font-size: 16px; color: var(--muted); margin: 13px 0 0; }
 
 /* ── entries (year-grouped list) ── */
 .entries { margin-top: 14px; }
@@ -114,7 +112,6 @@ main.wrap { padding-bottom: 72px; }
 
 /* ── post detail ── */
 .post-header { margin: 30px 0 32px; }
-.post-kicker { margin: 0 0 11px; }
 .post-title { font-family: var(--font-serif); font-weight: 700; font-size: 34px; line-height: 1.32; letter-spacing: -0.8px; color: var(--text); margin: 0; }
 .post-meta { display: flex; align-items: baseline; gap: 10px; margin-top: 14px; font-family: var(--font-mono); font-size: 13px; color: var(--faint); }
 .post-meta .dot { color: var(--border); }

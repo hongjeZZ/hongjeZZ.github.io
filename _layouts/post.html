@@ -2,59 +2,54 @@
 layout: default
 ---
 <article class="post">
-  <div class="post-layout">
-    <aside class="post-aside"><div id="toc-mount"></div></aside>
-    <div class="post-main">
-      <header class="post-header">
-        {%- if page.tags.size > 0 -%}
-        <p class="kicker post-kicker">{% for t in page.tags %}{{ t }}{% unless forloop.last %} · {% endunless %}{% endfor %}</p>
-        {%- endif -%}
-        <h1 class="post-title">{{ page.title }}</h1>
-        {%- assign chars = content | strip_html | size -%}
-        {%- assign minutes = chars | divided_by: 500 | plus: 1 -%}
-        <div class="post-meta">
-          <time class="post-date" datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%Y년 %-m월 %-d일" }}</time>
-          <span class="dot">·</span>
-          <span>약 {{ minutes }}분</span>
-        </div>
-      </header>
-
-      <div class="post-content">
-        {{ content }}
+  <div class="post-toc"><div id="toc-mount"></div></div>
+  <div class="post-main">
+    <header class="post-header">
+      <h1 class="post-title">{{ page.title }}</h1>
+      {%- assign chars = content | strip_html | size -%}
+      {%- assign minutes = chars | divided_by: 500 | plus: 1 -%}
+      <div class="post-meta">
+        <time class="post-date" datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%Y년 %-m월 %-d일" }}</time>
+        <span class="dot">·</span>
+        <span>약 {{ minutes }}분</span>
       </div>
+    </header>
 
-      {%- if page.tags.size > 0 -%}
-      <div class="post-tags">
-        {%- for t in page.tags -%}
-        <a class="tag-pin" href="{{ '/tags/' | relative_url }}#{{ t | slugify }}">#{{ t }}</a>
-        {%- endfor -%}
-      </div>
-      {%- endif -%}
-
-      {%- capture related_html -%}{%- assign count = 0 -%}{%- for post in site.posts -%}{%- if post.url != page.url and count < 3 -%}{%- assign common = post.tags | where_exp: "t", "page.tags contains t" -%}{%- if common.size > 0 -%}<a class="entry" href="{{ post.url | relative_url }}"><time class="entry-date">{{ post.date | date: "%Y.%m.%d" }}</time><span class="entry-body"><span class="entry-title">{{ post.title }}</span></span><span class="entry-arrow" aria-hidden="true">→</span></a>{%- assign count = count | plus: 1 -%}{%- endif -%}{%- endif -%}{%- endfor -%}{%- endcapture -%}
-      {%- if related_html contains 'class="entry"' -%}
-      <section class="related">
-        <h2 class="related-title">관련 글</h2>
-        <div class="entries">{{ related_html }}</div>
-      </section>
-      {%- endif -%}
-
-      {%- if page.previous or page.next -%}
-      <nav class="post-nav">
-        {%- if page.previous -%}
-        <a class="pnav prev" href="{{ page.previous.url | relative_url }}"><span class="pnav-dir">← 이전 글</span><span class="pnav-title">{{ page.previous.title }}</span></a>
-        {%- endif -%}
-        {%- if page.next -%}
-        <a class="pnav next" href="{{ page.next.url | relative_url }}"><span class="pnav-dir">다음 글 →</span><span class="pnav-title">{{ page.next.title }}</span></a>
-        {%- endif -%}
-      </nav>
-      {%- endif -%}
-
-      <section class="comments">
-        <h2 class="comments-title">댓글</h2>
-        <div id="giscus"></div>
-      </section>
+    <div class="post-content">
+      {{ content }}
     </div>
+
+    {%- if page.tags.size > 0 -%}
+    <div class="post-tags">
+      {%- for t in page.tags -%}
+      <a class="tag-pin" href="{{ '/tags/' | relative_url }}#{{ t | slugify }}">#{{ t }}</a>
+      {%- endfor -%}
+    </div>
+    {%- endif -%}
+
+    {%- capture related_html -%}{%- assign count = 0 -%}{%- for post in site.posts -%}{%- if post.url != page.url and count < 3 -%}{%- assign common = post.tags | where_exp: "t", "page.tags contains t" -%}{%- if common.size > 0 -%}<a class="entry" href="{{ post.url | relative_url }}"><time class="entry-date">{{ post.date | date: "%Y.%m.%d" }}</time><span class="entry-body"><span class="entry-title">{{ post.title }}</span></span><span class="entry-arrow" aria-hidden="true">→</span></a>{%- assign count = count | plus: 1 -%}{%- endif -%}{%- endif -%}{%- endfor -%}{%- endcapture -%}
+    {%- if related_html contains 'class="entry"' -%}
+    <section class="related">
+      <h2 class="related-title">관련 글</h2>
+      <div class="entries">{{ related_html }}</div>
+    </section>
+    {%- endif -%}
+
+    {%- if page.previous or page.next -%}
+    <nav class="post-nav">
+      {%- if page.previous -%}
+      <a class="pnav prev" href="{{ page.previous.url | relative_url }}"><span class="pnav-dir">← 이전 글</span><span class="pnav-title">{{ page.previous.title }}</span></a>
+      {%- endif -%}
+      {%- if page.next -%}
+      <a class="pnav next" href="{{ page.next.url | relative_url }}"><span class="pnav-dir">다음 글 →</span><span class="pnav-title">{{ page.next.title }}</span></a>
+      {%- endif -%}
+    </nav>
+    {%- endif -%}
+
+    <section class="comments">
+      <h2 class="comments-title">댓글</h2>
+      <div id="giscus"></div>
+    </section>
   </div>
 </article>
 
@@ -113,7 +108,6 @@ layout: default
       });
       nav.appendChild(t); nav.appendChild(ul);
       document.getElementById('toc-mount').appendChild(nav);
-      document.querySelector('.post-layout').classList.add('has-toc');
       if ('IntersectionObserver' in window) {
         var map = {}; links.forEach(function (l) { map[l.id] = l.a; });
         var obs = new IntersectionObserver(function (es) {
