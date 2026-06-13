@@ -41,15 +41,16 @@ body {
 }
 .wrap { max-width: 900px; margin: 0 auto; padding: 0 26px; }
 /* 포스트: 좌측 목차 + 본문 2컬럼. 목차는 '그리드 아이템'에 직접 sticky →
-   그리드 영역이 본문 높이만큼 늘어나므로 글 끝까지 스크롤을 따라온다.
-   좁은 화면(<1000px)에서는 본문 위에 정적으로 펼친다. */
+   그리드 영역이 본문 높이만큼 늘어나 글 끝까지 따라온다. .post 상단 패딩으로 양 컬럼이
+   같은 높이에서 시작 → 목차 첫 줄과 제목이 정렬된다. 사이드 공간이 없는 좁은 화면(<880px)은
+   본문 위로 끼어들지 않도록 목차를 숨긴다. */
 .wrap-post { max-width: 1040px; }
+.post { padding-top: 30px; }
 .post-main { min-width: 0; }
-.post-toc { margin-bottom: 26px; }
-.post-toc .toc { position: static; }
-@media (min-width: 1000px) {
-  .post { display: grid; grid-template-columns: 172px minmax(0, 1fr); column-gap: 46px; align-items: start; }
-  .post-toc { position: sticky; top: 26px; align-self: start; max-height: calc(100vh - 52px); overflow-y: auto; margin-bottom: 0; }
+.post-toc { display: none; }
+@media (min-width: 880px) {
+  .post { display: grid; grid-template-columns: 168px minmax(0, 1fr); column-gap: 44px; align-items: start; }
+  .post-toc { display: block; position: sticky; top: 26px; align-self: start; max-height: calc(100vh - 52px); overflow-y: auto; }
 }
 
 /* ── header / nav ── */
@@ -117,7 +118,7 @@ main.wrap { padding-bottom: 72px; }
 .entry:hover .entry-arrow { opacity: 1; transform: translateX(3px); }
 
 /* ── post detail ── */
-.post-header { margin: 0 0 32px; padding-top: 30px; }
+.post-header { margin: 0 0 32px; }
 .post-title { font-family: var(--font-serif); font-weight: 700; font-size: 34px; line-height: 1.32; letter-spacing: -0.8px; color: var(--text); margin: 0; }
 .post-meta { display: flex; align-items: baseline; gap: 10px; margin-top: 14px; font-family: var(--font-mono); font-size: 13px; color: var(--faint); }
 .post-meta .dot { color: var(--border); }
