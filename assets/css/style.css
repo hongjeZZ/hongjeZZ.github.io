@@ -48,12 +48,11 @@ body {
    그리드 영역이 본문 높이만큼 늘어나 글 끝까지 따라온다. .post 상단 패딩으로 양 컬럼이
    같은 높이에서 시작 → 목차 첫 줄과 제목이 정렬된다. 사이드 공간이 없는 좁은 화면(<880px)은
    본문 위로 끼어들지 않도록 목차를 숨긴다. */
-.wrap-post { max-width: 1040px; }
 .post { padding-top: 30px; }
 .post-main { min-width: 0; }
 .post-toc { display: none; }
 @media (min-width: 880px) {
-  .post { display: grid; grid-template-columns: 168px minmax(0, 1fr); column-gap: 44px; align-items: start; }
+  .post { display: grid; grid-template-columns: 150px minmax(0, 1fr); column-gap: 38px; align-items: start; }
   .post-toc { display: block; position: sticky; top: 26px; align-self: start; max-height: calc(100vh - 52px); overflow-y: auto; }
 }
 
@@ -84,7 +83,9 @@ body {
 html[data-theme="light"] .icon-sun { display: none; }
 html[data-theme="dark"] .icon-moon { display: none; }
 
-main.wrap { padding-bottom: 72px; flex: 1 0 auto; }
+/* flex 컬럼(sticky footer)에서 main이 가로 auto 마진 탓에 내용폭으로 줄어드는 것을 막음:
+   width:100% 명시 → max-width(900)까지 채우고 auto 마진으로 중앙정렬 (헤더와 동일 폭) */
+main.wrap { padding-bottom: 72px; flex: 1 0 auto; width: 100%; }
 .site-footer { flex-shrink: 0; }
 
 /* ── nav search ── */
