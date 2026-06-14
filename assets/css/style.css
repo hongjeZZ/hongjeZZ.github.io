@@ -284,13 +284,12 @@ html[data-theme="dark"] { --callout-note: #8aa0ff; --callout-tip: #6cc191; --cal
   .nav-search-input { width: 108px; }
   .nav-search-input:focus { width: 142px; }
 }
-/* 모바일 헤더 정돈: 브랜드+토글 한 줄 / 검색 한 줄(전체폭) / 메뉴 한 줄 */
+/* 모바일 헤더: 검색 숨김 → 브랜드·메뉴·토글 한 줄(.nav-links margin-left:auto로 우측 그룹).
+   활성 탭의 파란 밑줄(::after bottom:-4px)이 헤더 구분선과 겹치지 않게 하단 여유 확보 */
 @media (max-width: 640px) {
-  .brand { order: 0; }
-  #theme-toggle { order: 1; }
-  .nav-links { order: 2; flex-basis: 100%; margin-left: 0; justify-content: flex-start; gap: 11px 17px; }
-  .nav-search { flex-basis: 100%; }
-  .nav-search-input, .nav-search-input:focus { width: 100%; }
+  .nav-search { display: none; }
+  .nav-links { gap: 15px; }
+  .nav { padding-bottom: 22px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
