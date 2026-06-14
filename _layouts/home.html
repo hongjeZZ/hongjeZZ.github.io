@@ -8,9 +8,16 @@ layout: default
   <div class="year-head">
     <span class="year-num{% if group.name != newest_year %} past{% endif %}">{{ group.name }}</span>
     <span class="year-rule"></span>
-    <span class="year-count">{{ group.items | size }}편</span>
+    <span class="year-count">{{ group.items | size }}</span>
   </div>
   {%- for post in group.items -%}
+  {%- comment -%} 본문 첫 이미지를 썸네일로. 없으면 파비콘을 기본 이미지로. {%- endcomment -%}
+  {%- assign thumb = '' -%}
+  {%- assign _ip = post.content | split: '<img ' -%}
+  {%- if _ip.size > 1 -%}
+    {%- assign _is = _ip[1] | split: 'src="' -%}
+    {%- if _is.size > 1 -%}{%- assign thumb = _is[1] | split: '"' | first -%}{%- endif -%}
+  {%- endif -%}
   <a class="entry" href="{{ post.url | relative_url }}">
     <time class="entry-date" datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%m.%d" }}</time>
     <span class="entry-body">
@@ -19,6 +26,11 @@ layout: default
       <span class="entry-ex">{{ post.excerpt | strip_html | strip_newlines | truncate: 84 }}</span>
       {%- endif -%}
     </span>
+    {%- if thumb != '' -%}
+    <img class="entry-thumb" src="{{ thumb }}" alt="" loading="lazy" width="48" height="48">
+    {%- else -%}
+    <img class="entry-thumb entry-thumb--default" src="{{ '/favicon.svg' | relative_url }}" alt="" loading="lazy" width="48" height="48">
+    {%- endif -%}
     <span class="entry-arrow" aria-hidden="true">→</span>
   </a>
   {%- endfor -%}

@@ -122,6 +122,9 @@ main.wrap { padding-bottom: 72px; flex: 1 0 auto; width: 100%; }
 .entry-ex { font-size: 12.5px; color: var(--muted); }
 .entry-arrow { align-self: center; color: var(--accent); opacity: 0; transition: opacity 0.15s ease, transform 0.15s ease; }
 .entry:hover .entry-arrow { opacity: 1; transform: translateX(3px); }
+.entry-thumb { flex: none; align-self: center; width: 48px; height: 48px; border-radius: 9px; object-fit: cover; background: var(--surface); border: 1px solid var(--border); }
+.entry-thumb--default { object-fit: contain; padding: 11px; }
+@media (max-width: 600px) { .entry-thumb { width: 42px; height: 42px; } .entry-thumb--default { padding: 9px; } }
 
 /* ── post detail ── */
 .post-header { margin: 0 0 22px; }
