@@ -62,7 +62,7 @@ body {
 .brand { display: flex; align-items: center; gap: 9px; text-decoration: none; }
 .brand-mark { color: var(--accent); flex-shrink: 0; }
 .brand-name { font-size: 15px; font-weight: 600; color: var(--text); letter-spacing: -0.2px; }
-.nav-links { display: flex; align-items: center; gap: 19px; row-gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+.nav-links { display: flex; align-items: center; gap: 19px; row-gap: 10px; flex-wrap: wrap; justify-content: flex-end; margin-left: auto; }
 .nav-links a { position: relative; font-size: 14.5px; color: var(--muted); text-decoration: none; transition: color 0.15s ease; }
 .nav-links a::after { content: ''; position: absolute; left: 0; right: 0; bottom: -4px; height: 2px; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform 0.18s ease; }
 .nav-links a:hover { color: var(--text); }
@@ -283,6 +283,14 @@ html[data-theme="dark"] { --callout-note: #8aa0ff; --callout-tip: #6cc191; --cal
   .nav-links { gap: 13px; }
   .nav-search-input { width: 108px; }
   .nav-search-input:focus { width: 142px; }
+}
+/* 모바일 헤더 정돈: 브랜드+토글 한 줄 / 검색 한 줄(전체폭) / 메뉴 한 줄 */
+@media (max-width: 640px) {
+  .brand { order: 0; }
+  #theme-toggle { order: 1; }
+  .nav-links { order: 2; flex-basis: 100%; margin-left: 0; justify-content: flex-start; gap: 11px 17px; }
+  .nav-search { flex-basis: 100%; }
+  .nav-search-input, .nav-search-input:focus { width: 100%; }
 }
 
 @media (prefers-reduced-motion: reduce) {
