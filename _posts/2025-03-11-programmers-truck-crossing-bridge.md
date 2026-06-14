@@ -13,7 +13,7 @@ tags: [구현, 시뮬레이션, 큐]
 
 **링크**: <https://school.programmers.co.kr/learn/courses/30/lessons/42583>
 
-[🔗 프로그래머스 SW개발자를 위한 평가, 교육, 채용까지 Total Solution을 제공하는 개발자 성장을 위한 베이스캠프 programmers.co.kr](https://school.programmers.co.kr/learn/courses/30/lessons/42583)
+[🔗 프로그래머스 - 다리를 지나는 트럭](https://school.programmers.co.kr/learn/courses/30/lessons/42583)
 
 ![](/assets/img/programmers-truck-crossing-bridge/01.png)
 
@@ -26,8 +26,9 @@ tags: [구현, 시뮬레이션, 큐]
 1. 트럭은 1초에 1씩 전진한다.
 2. 트럭은 1초에 1대씩 다리에 올라갈 수 있다.
 
-1. Queue 자료구조를 사용해서 다리 위 트럭 객체를 관리
+이를 바탕으로 다음과 같이 구현한다.
 
+1. Queue 자료구조를 사용해서 다리 위 트럭 객체를 관리
 2. currentWeight, idx, time 변수를 통해 현재 다리 위 무게, 시간, 대기 트럭의 인덱스를 관리
 
 ```java
@@ -57,7 +58,7 @@ if (idx < truck_weights.length) {
 
 무게 제한을 초과하지 않는 경우에만 다리에 트럭을 추가한다.
 
-다리에 트럭을 추가할 때, 다리의 길이만큼 현재 시간을 더해준 이유는 **다리를 건너는 시간은 다리의 길이만큼 걸리기 때문**
+다리에 트럭을 추가할 때, 다리의 길이만큼 현재 시간을 더해준 이유는 **다리를 건너는 시간은 다리의 길이만큼 걸리기 때문**이다.
 
 또한 다리의 길이만큼 트럭을 올릴 수 있기 때문에 해당 조건도 추가한다.
 

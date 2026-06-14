@@ -13,7 +13,7 @@ tags: [BFS, 구현]
 
 **링크**: <https://school.programmers.co.kr/learn/courses/30/lessons/60063>
 
-[🔗 프로그래머스 SW개발자를 위한 평가, 교육, 채용까지 Total Solution을 제공하는 개발자 성장을 위한 베이스캠프 programmers.co.kr](https://school.programmers.co.kr/learn/courses/30/lessons/60063)
+[🔗 프로그래머스 - 블록 이동하기](https://school.programmers.co.kr/learn/courses/30/lessons/60063)
 
 ## 문제 설명
 
@@ -29,14 +29,14 @@ tags: [BFS, 구현]
 
 **"0"**과 **"1"**로 이루어진 지도인 board가 주어질 때, 로봇이 **(N, N)** 위치까지 이동하는데 필요한 최소 시간을 return 하도록 solution 함수를 완성해주세요.
 
-#### 제한 사항
+### 제한 사항
 
 - board의 한 변의 길이는 **5 이상 100 이하**입니다.
 - board의 원소는 **0 또는 1**입니다.
 - 로봇이 처음에 놓여 있는 칸 **(1, 1), (1, 2)는 항상 0**으로 주어집니다.
 - 로봇이 항상 목적지에 **도착할 수 있는 경우만** 입력으로 주어집니다.
 
-#### 입출력 예
+### 입출력 예
 
 **board** : [[0, 0, 0, 1, 1],[0, 0, 0, 1, 0],[0, 1, 0, 1, 1],[1, 1, 0, 0, 1],[0, 0, 0, 0, 0]]
 

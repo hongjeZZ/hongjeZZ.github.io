@@ -7,13 +7,11 @@ tags: [구현, 문자열]
 
 **난이도** : Level 2
 
-**유형 :**문자열 / 구현
+**유형** : 문자열 / 구현
 
 **구현 시간** : 1시간
 
-**링크:<https://school.programmers.co.kr/learn/courses/30/lessons/60057>**
-
-[🔗 프로그래머스 SW개발자를 위한 평가, 교육, 채용까지 Total Solution을 제공하는 개발자 성장을 위한 베이스캠프 programmers.co.kr](https://school.programmers.co.kr/learn/courses/30/lessons/60057)
+**링크** : [프로그래머스 - 문자열 압축](https://school.programmers.co.kr/learn/courses/30/lessons/60057)
 
 ![](/assets/img/programmers-string-compression/01.png)
 

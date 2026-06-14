@@ -7,7 +7,7 @@ tags: [구현, 백트래킹, 조합]
 
 **난이도** : 골드 5
 
-**유형 :** 조합 / 구현 / 백트래킹
+**유형** : 조합 / 구현 / 백트래킹
 
 **링크** : <https://www.acmicpc.net/problem/15686>
 
@@ -29,7 +29,7 @@ tags: [구현, 백트래킹, 조합]
 
 ## 1차 시도 - 성공
 
-```arduino
+```java
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

@@ -7,13 +7,13 @@ tags: [BFS, 카카오, 큐]
 
 **난이도** : Level 3
 
-**유형 :**BFS / 큐
+**유형** : BFS / 큐
 
 **구현 시간** : 1시간 (못품)
 
-**링크: <https://school.programmers.co.kr/learn/courses/30/lessons/67259>**
+**링크** : <https://school.programmers.co.kr/learn/courses/30/lessons/67259>
 
-[🔗 프로그래머스 SW개발자를 위한 평가, 교육, 채용까지 Total Solution을 제공하는 개발자 성장을 위한 베이스캠프 programmers.co.kr](https://school.programmers.co.kr/learn/courses/30/lessons/67259)
+[🔗 프로그래머스 - 경주로 건설](https://school.programmers.co.kr/learn/courses/30/lessons/67259)
 
 ![](/assets/img/programmers-race-track/01.png)
 
@@ -35,7 +35,7 @@ tags: [BFS, 카카오, 큐]
 
 ## 1차 시도 - 통과 (다른 사람 코드 참조)
 
-```angelscript
+```java
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
@@ -127,7 +127,9 @@ int[][] board = {
 };
 ```
 
-마지막 테스트 케이스 25번을 계속 실패했었는데, 그 이유는 board[4][3] 지점에서 서로 다른 경로가 만나게 되는데 방향이 다름에도 금액만 비교하여 잘못된 최소값을 저장하는 문제였다. 이러한 문제는 방향 정보를 고려하지 않기 때문에 우측 경로가 board[4][3] 지점에서 더 저렴하여 선택되지만, 그 이후 코너를 건설하는 비용이 추가되어 좌측 경로가 정답이었다. 이를 해결하기 위해 cost 배열에 방향 정보를 추가한 3차원 배열을 사용했다. 하지만 이러한 배열은 성능이 좋지 않을 것으로 우려되어 2차 시도에 개선해서 다시 문제를 풀어보았다.
+마지막 테스트 케이스 25번을 계속 실패했었는데, 그 이유는 board[4][3] 지점에서 서로 다른 경로가 만나게 되는데 방향이 다름에도 금액만 비교하여 잘못된 최소값을 저장하는 문제였다.
+
+이러한 문제는 방향 정보를 고려하지 않기 때문에 우측 경로가 board[4][3] 지점에서 더 저렴하여 선택되지만, 그 이후 코너를 건설하는 비용이 추가되어 좌측 경로가 정답이었다. 이를 해결하기 위해 **cost 배열에 방향 정보를 추가한 3차원 배열**을 사용했다. 하지만 이러한 배열은 성능이 좋지 않을 것으로 우려되어 2차 시도에 개선해서 다시 문제를 풀어보았다.
 
 ## 2차 시도 - 통과
 

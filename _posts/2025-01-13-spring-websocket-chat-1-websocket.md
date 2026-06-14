@@ -13,8 +13,8 @@ tags: [STOMP, 네트워크, 웹소켓]
 
 ## 웹소켓(WebSocket) 이란 ❓
 
-서버와 클라이언트 간의 메시지를 교환하기 위한 통신 방법입니다.   
-  
+서버와 클라이언트 간의 메시지를 교환하기 위한 통신 방법입니다.
+
 일반적으로 서버와 클라이언트는 HTTP 통신을 통해 메시지를 주고받지만, 아래와 같은 웹소켓의 특징 때문에 현재 인터넷 환경(HTML5)에서 채팅, 주식, 비디오 데이터 등을 전송할 때 주로 사용됩니다.
 
 ### 웹소켓의 특징
@@ -30,16 +30,18 @@ tags: [STOMP, 네트워크, 웹소켓]
 - 웹 환경에서 연속된 데이터를 빠르게 노출시킬 수 있다.
 - 여러 단말기에서 빠르게 정보를 교환할 수 있다.
 
-위 두 가지 특징을 가진 웹소켓과 달리, HTTP 통신은 클라이언트에서 서버에 요청을 보내야만 서버에서 응답을 할 수 있는 단방향 통신입니다.   
-  
-또한 웹소켓 이전에는 HTTP를 이용한 **Polling**, **LongPolling**, **Streaming과** 같은 실시간 통신을 구현한 기술이 있었습니다. 이러한 기술에는 불필요한 request와  connection을 생성하고, 클라이언트에서 서버로의 데이터 송신이 어렵다는 단점이 있습니다. 무엇보다 HTTP 통신의 가장 큰 한계점은 HTTP를 통해 통신하기 때문에 **Request와 Response의 헤더가 불필요하게 크다**는 것입니다. 웹소켓 프로토콜 또한 커넥션을 맺을 때는 HTTP를 사용하지만, 그 이후 통신은 웹소켓의 독자적인 프로토콜로 이루어지며 헤더가 HTTP 통신에 비해 상대적으로 작습니다.
+위 두 가지 특징을 가진 웹소켓과 달리, HTTP 통신은 클라이언트에서 서버에 요청을 보내야만 서버에서 응답을 할 수 있는 단방향 통신입니다.
+
+또한 웹소켓 이전에는 HTTP를 이용한 **Polling**, **LongPolling**, **Streaming**과 같은 실시간 통신을 구현한 기술이 있었습니다. 이러한 기술에는 불필요한 request와 connection을 생성하고, 클라이언트에서 서버로의 데이터 송신이 어렵다는 단점이 있습니다. 무엇보다 HTTP 통신의 가장 큰 한계점은 HTTP를 통해 통신하기 때문에 **Request와 Response의 헤더가 불필요하게 크다**는 것입니다.
+
+웹소켓 프로토콜 또한 커넥션을 맺을 때는 HTTP를 사용하지만, 그 이후 통신은 웹소켓의 독자적인 프로토콜로 이루어지며 헤더가 HTTP 통신에 비해 상대적으로 작습니다.
 
 이러한 이유로 정식으로 클라이언트와 서버 간의 실시간 양방향 통신이 가능하게 하기 위해 HTML5 표준으로 웹소켓이 만들어졌습니다.
 
-> Polling, Long Polling, Streaming에 관한 자세한 내용이 궁금하시다면 아래 링크를 참고해 주세요!  
-> <https://velog.io/@hahan/Polling-Long-Polling-Streaming>
+> [!tip] 참고
+> Polling, Long Polling, Streaming에 관한 자세한 내용이 궁금하시다면 아래 링크를 참고해 주세요!
 
-[🔗 Polling / Long Polling / Streaming Http통신은 클라이언트에서 서버로의 단방향 통신을 위해 만들어진 기술로, Web Socket 기술이 나타나기 전에는 실시간 통신을 위해서 Http통신에 약간의 트릭을 사용해서 실시간인 것 처럼 작동하 velog.io](https://velog.io/@hahan/Polling-Long-Polling-Streaming)
+[🔗 Polling / Long Polling / Streaming](https://velog.io/@hahan/Polling-Long-Polling-Streaming)
 
 ### 웹소켓 동작원리
 
@@ -49,7 +51,7 @@ tags: [STOMP, 네트워크, 웹소켓]
 
 #### 핸드셰이크 요청
 
-```bash
+```http
 GET /chat HTTP/1.1
 Host: server.example.com
 Upgrade: websocket
@@ -69,7 +71,7 @@ Origin: http://example.com
 
 #### 연결 성공 응답
 
-```bash
+```http
 HTTP/1.1 101 Switching Protocols
 Upgrade: websocket
 Connection: Upgrade
@@ -80,11 +82,9 @@ Sec-WebSocket-Protocol: chat
 - 101 Switching Protocols: 프로토콜 전환을 승인한다는 의미입니다. (웹소켓이 연결됨)
 - Sec-WebSocket-Accept: 클라이언트로 받은 Sec-WebSocket-Key를 사용하여 계산된 값으로, 클라이언트에서 계산한 값과 일치하지 않으면 연결이 되지 않습니다.
 
-웹소켓 연결 이후로는 프로토콜이 **WS** 혹은 **WSS**로 변경됩니다.   
-이때, 여러 frame이 모여서 구성되는 **Message 라는** 단위로 데이터를 전송합니다. 이 Message 에는 텍스트(UTF-8) 데이터와 바이너리 데이터, 컨트롤 프레임(프로토콜 레벨의 신호)등을 담을 수 있습니다.
+웹소켓 연결 이후로는 프로토콜이 **WS** 혹은 **WSS**로 변경됩니다. 이때, 여러 frame이 모여서 구성되는 **Message**라는 단위로 데이터를 전송합니다. 이 Message 에는 텍스트(UTF-8) 데이터와 바이너리 데이터, 컨트롤 프레임(프로토콜 레벨의 신호)등을 담을 수 있습니다.
 
-**frame** 은 communication에서 가장 작은 단위의 데이터로 작은 헤더와 payload 로 구성됩니다.   
-앞서 설명했던 HTTP와 헤더 크기의 차이점을 이 부분에서 알 수 있습니다.
+**frame**은 communication에서 가장 작은 단위의 데이터로 작은 헤더와 payload 로 구성됩니다. 앞서 설명했던 HTTP와 헤더 크기의 차이점을 이 부분에서 알 수 있습니다.
 
 ### 웹소켓과 HTTP 통신의 차이점
 
@@ -95,7 +95,7 @@ Sec-WebSocket-Protocol: chat
 | 연결 지속성 | - 연결이 한 번 맺어진 이후에는 **지속적인 연결 상태**를 유지 - 연결을 유지하면서 데이터를 주고받기 때문에 반복적인 연결 설정 과정이 필요하지 않음 | - 요청-응답마다 새로운 연결을 설정하며, 연결이 종료됩니다. - 지속적인 데이터 전송이 필요한 경우, 연결을 반복적으로 설정해야 함 |
 | 오버헤드 | - 초기 연결(handshake)은 HTTP 프로토콜을 사용하지만, 연결 후에는 웹소켓 프로토콜을 사용하여 헤더 크기가 상당히 작아지고 데이터 전송이 효율적임 | - 요청과 응답에 포함된 헤더가 비교적 크며, 매번 새 연결마다 헤더가 포함됨 - 실시간 통신에서는 불필요한 오버헤드가 발생할 수 있음 |
 | 성능 | - 지속적인 연결을 유지하고 헤더 크기가 작아 효율적인 데이터 전송이 가능 - 주식, 채팅, 게임, 비디오 스트리밍 등 **실시간 통신**에서 성능이 뛰어남 | - 요청-응답 구조로 인해 연결 및 데이터 전송에 소요되는 시간이 길어짐 - 실시간 통신을 위해서는 추가적인 기술(Polling, Long Polling 등)이 필요 |
-| 통신 프로토콜 | - HTTP에서 연결 설정 후, **ws:// 또는 wss://**(SSL/TLS 지원)로 전환하여 별도의 웹소켓 프로토콜로 통신 | **- HTTP/HTTPS**를 사용하며, 기본적으로 요청-응답 모델을 따름 |
+| 통신 프로토콜 | - HTTP에서 연결 설정 후, **ws:// 또는 wss://**(SSL/TLS 지원)로 전환하여 별도의 웹소켓 프로토콜로 통신 | - **HTTP/HTTPS**를 사용하며, 기본적으로 요청-응답 모델을 따름 |
 
 ## STOMP 란?
 
@@ -107,7 +107,7 @@ STOMP 를 통해 서버와 클라이언트는 전송할 메시지의 유형, 형
 
 ### STOMP 메시지 프레임
 
-```bash
+```text
 COMMAND
 header1:value1
 header2:value2
@@ -130,11 +130,12 @@ Body(optional)
 
 이번 기회로 웹소켓과 STOMP 프로토콜의 기본적인 개념에 대해 알아보고, 왜 채팅 서비스에 웹소켓 통신을 사용하는지 이해할 수 있었습니다. 추가로 개념이 궁금하신 분이 있다면 아래 레퍼런스를 참고하시면 좋을 것 같습니다. 감사합니다 :)
 
-> 아래 레퍼런스를 참고하였습니다.  
->   
-> [웹소켓 - 위키백과](https://ko.wikipedia.org/wiki/%EC%9B%B9%EC%86%8C%EC%BC%93)  
-> [Polling / Long Polling / Streaming](https://velog.io/@hahan/Polling-Long-Polling-Streaming)  
-> [[10분 테코톡] ✨ 아론의 웹소켓&스프링](https://www.youtube.com/watch?v=rvss-_t6gzg&t=94s)  
-> [[10분 테코톡] 코일의 Web Socket](https://youtu.be/MPQHvwPxDUw?si=-jH-mjq185hMoKW1)
+> [!note] 레퍼런스
+> 아래 레퍼런스를 참고하였습니다.
+>
+> - [웹소켓 - 위키백과](https://ko.wikipedia.org/wiki/%EC%9B%B9%EC%86%8C%EC%BC%93)
+> - [Polling / Long Polling / Streaming](https://velog.io/@hahan/Polling-Long-Polling-Streaming)
+> - [[10분 테코톡] ✨ 아론의 웹소켓&스프링](https://www.youtube.com/watch?v=rvss-_t6gzg&t=94s)
+> - [[10분 테코톡] 코일의 Web Socket](https://youtu.be/MPQHvwPxDUw?si=-jH-mjq185hMoKW1)
 
 [🔗 [Spring boot] WebSocket 을 사용하여 채팅 서비스 구현하기(2) - 채팅 데이터베이스 설계하기](/posts/spring-websocket-chat-2-data/)

@@ -7,9 +7,9 @@ tags: [DP]
 
 **난이도** : 실버 1
 
-**유형 :** DP(동적 계획법)
+**유형** : DP(동적 계획법)
 
-**링크** : <https://www.acmicpc.net/problem/2156>
+**링크** : [백준 2156번 - 포도주 시식](https://www.acmicpc.net/problem/2156)
 
 **구현 시간** : 1시간
 

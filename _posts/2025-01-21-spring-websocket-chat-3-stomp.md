@@ -15,7 +15,7 @@ tags: [STOMP, 웹소켓]
 
 #### build.gradle
 
-```bash
+```groovy
 // WebSocket
 implementation 'org.springframework.boot:spring-boot-starter-websocket'
 ```
@@ -65,8 +65,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 ## 채팅 엔티티
 
 #### GoodsChatRoom.java (채팅방)
-
-더보기
 
 ```java
 @Entity
@@ -118,11 +116,7 @@ public class GoodsChatRoom {
 - GoodsChatRoom 엔티티는 **판매글**(*GoodsPost*)에 대한 채팅방 정보를 관리합니다.
 - 채팅참여(**GoodsChatPart**)와 일대다 관계를 맺음으로 하나의 채팅방에 다수의 인원이 참여할 수 있습니다. 또한 *CascadeType.ALL*과 *orphanRemoval = true* 설정을 통해 채팅참여의 생명주기를 함께 관리합니다.
 
-#### 
-
 #### GoodsChatPart.java (채팅 참여)
-
-더보기
 
 ```java
 @Data
@@ -173,11 +167,7 @@ public class GoodsChatPart {
 - *GoodsChatPartId* :*memberId*와 *goodsChatRoomId*를 사용하여 복합키를 정의하였고, *@IdClass* 어노테이션을 통해 복합키 클래스를 지정했습니다.
 - 사용자의 역할(*role*) 필드를 정의하여, 사용자가 판매자 혹은 구매자인지 구별하였습니다.
 
-#### 
-
 #### GoodsChatMessage.java (채팅 메시지)
-
-더보기
 
 ```java
 @Entity
@@ -208,7 +198,7 @@ public class GoodsChatMessage {
 }
 ```
 
-- ***GoodsChatMessage*****엔티티는 특정 채팅방에서 주고받은 메시지 정보를 관리합니다.**
+- **GoodsChatMessage 엔티티는 특정 채팅방에서 주고받은 메시지 정보를 관리합니다.**
 - 채팅참여(*GoodsChatPart*)와 다대일 관계를 가지며, 복합 키(*member_id*, *chat_room_id*)를 외래 키로 참조합니다.
 - *MessageType* 필드를 통해 메시지 유형을 구분합니다. 다양한 유형의 메시지를 저장할 수 있습니다.
 
@@ -286,7 +276,7 @@ public class GoodsChatMessageService {
 
 #### GoodsChatEvent.java
 
-```fsharp
+```java
 public record GoodsChatEvent(Long chatRoomId, Member member, MessageType type) {
 
     public static GoodsChatEvent from(Long chatRoomId, Member member, MessageType type) {
@@ -315,8 +305,7 @@ public class GoodsChatEventPublisher {
 
 - *GoodsChatEventPublisher* 클래스는 *ApplicationEventPublisher* 클래스를 주입받아 채팅 관련 이벤트를 발행합니다.
 
-> # ApplicationEventPublisher를 직접 사용하지 않은 이유  
->   
+> [!note] ApplicationEventPublisher를 직접 사용하지 않은 이유
 > 추후 이벤트 발행 로직에 변화가 생겼을 때, 코드 변경을 최소화할 수 있도록 ApplicationEventPublisher를 직접 사용하지 않고 GoodsChatEventPublisher 커스텀 클래스를 구현했습니다. 이를 통해 다른 코드에 미치는 영향을 최소화할 수 있습니다.
 
 #### GoodsChatService.java
@@ -392,7 +381,7 @@ public class GoodsChatEventHandler {
 
 ### **@Async** 사용 시 주의사항
 
-#### 1. **@TransactionalEventListener**와 **@Async**가 함께 사용된 경우
+1. **@TransactionalEventListener**와 **@Async**가 함께 사용된 경우
 
 - 이벤트 처리 로직에서 발생한 트랜잭션 롤백이 이벤트를 호출한 메서드의 트랜잭션에 영향을 미치지 않습니다.
 - 예를 들어, 입장 메시지 저장이 실패한 경우 채팅방 입장은 정상적으로 수행됩니다.
@@ -461,8 +450,9 @@ public class AsyncConfig {
   - 애플리케이션 종료 시, 대기 중인 작업을 모두 완료한 후 종료하도록 설정합니다.
   - 최대 60초 동안 대기 후, 남아있는 작업이 있더라도 강제 종료합니다.
 
-> 해당 설정은 소규모 EC2(t3a.small) 환경에서 효율적으로 비동기 작업을 처리하기 위해 적용되었습니다.  
-> 기본 5개 스레드로 운영하다가 부하가 증가하면 최대 10개까지 확장하며, 100개의 대기 큐로 요청을 수용합니다.  
+> [!note]
+> 해당 설정은 소규모 EC2(t3a.small) 환경에서 효율적으로 비동기 작업을 처리하기 위해 적용되었습니다.
+> 기본 5개 스레드로 운영하다가 부하가 증가하면 최대 10개까지 확장하며, 100개의 대기 큐로 요청을 수용합니다.
 > 사용량이 적을 때는 유휴 스레드를 제거하여 리소스를 절약하고, 서버 종료 시에도 작업을 안정적으로 마무리하도록 구성했습니다.
 
 #### GoodsChatMessageService.java - 이벤트 처리 추가
@@ -510,11 +500,11 @@ private void sendToSubscribers(Long chatRoomId, GoodsChatMessageResponse message
 
 그러나 이번 포스팅에서 작성된 코드에는 몇 가지 성능적인 문제점이 존재합니다.
 
-#### 첫째, 예시로 사용한 스프링 내장 메시지 브로커는 설정이 간편하다는 장점이 있지만, 성능과 확장성 측면에서 명확한 한계가 있습니다.
+**첫째, 예시로 사용한 스프링 내장 메시지 브로커는 설정이 간편하다는 장점이 있지만, 성능과 확장성 측면에서 명확한 한계가 있습니다.**
 
 스프링 내장 브로커는 단일 JVM 내에서만 작동하므로 여러 서버 인스턴스 간의 메시지 공유가 불가능합니다. 이로 인해, 대규모 사용자 환경에서는 메시지 전송의 일관성이 보장되지 않으며, 이로 인해 메시지 손실이나 중복 전송과 같은 문제가 발생할 수 있습니다. 따라서 대규모 사용자 환경에서는 **Kafka, RabbitMQ와 같은 외부 메시지 브로커**를 도입해야 할 필요성이 큽니다. 이러한 외부 브로커는 분산 시스템에서의 메시지 전송을 효율적으로 처리할 수 있는 기능을 제공하므로, 성능과 안정성을 높일 수 있습니다.
 
-#### 둘째, 현재 구현된 서비스는 사용자 수가 증가함에 따라 성능 저하가 발생할 우려가 큽니다.
+**둘째, 현재 구현된 서비스는 사용자 수가 증가함에 따라 성능 저하가 발생할 우려가 큽니다.**
 
 채팅 데이터베이스가 RDBMS로 구성되어 있기 때문에 메시지 전송 간의 지연 시간이 증가할 가능성이 있습니다. 이는 사용자 경험에 부정적인 영향을 미칠 수 있으며, 특히 실시간성이 중요한 채팅 서비스에서는 더욱 중요한 문제입니다. 또한, 채팅 서비스의 특성상 데이터베이스 조회가 빈번하게 발생하기 때문에 I/O 비용이 상당히 클 것으로 예상되어 DB 서버에 과부하가 걸릴 수 있으며, 이는 전체 시스템의 응답 속도를 저하시킬 수 있습니다.
 

@@ -27,7 +27,7 @@ DP 테이블은 각 위치에서 끝나는 가장 긴 감소하는 부분 수열
 
 ## 1차 시도 - 통과
 
-```arduino
+```java
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

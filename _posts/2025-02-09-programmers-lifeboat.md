@@ -13,7 +13,7 @@ tags: [그리디, 이진탐색, 투 포인터]
 
 **링크**: <https://school.programmers.co.kr/learn/courses/30/lessons/42885>
 
-[🔗 프로그래머스 SW개발자를 위한 평가, 교육, 채용까지 Total Solution을 제공하는 개발자 성장을 위한 베이스캠프 programmers.co.kr](https://school.programmers.co.kr/learn/courses/30/lessons/42885)
+[🔗 프로그래머스 - 구명 보트](https://school.programmers.co.kr/learn/courses/30/lessons/42885)
 
 ![](/assets/img/programmers-lifeboat/01.png)
 
