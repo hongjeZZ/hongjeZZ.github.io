@@ -14,15 +14,15 @@
   --font-mono: 'JetBrains Mono', '42dot Sans', ui-monospace, Menlo, monospace;
 }
 html[data-theme="dark"] {
-  --bg: #15161a;
-  --surface: #1d1f25;
-  --text: #e8eaf0;
-  --muted: #9a9eaa;
-  --faint: #6a6e7a;
-  --border: #2a2c34;
+  --bg: #1c1d23;
+  --surface: #25262e;
+  --text: #e9ebf1;
+  --muted: #a1a5b0;
+  --faint: #757987;
+  --border: #34353f;
   --accent: #8aa0ff;
-  --code-bg: #21232a;
-  --shadow: 0 12px 34px rgba(0, 0, 0, 0.5);
+  --code-bg: #2a2b34;
+  --shadow: 0 12px 34px rgba(0, 0, 0, 0.45);
 }
 
 * { box-sizing: border-box; }
@@ -260,7 +260,7 @@ html[data-theme="dark"] { --callout-note: #8aa0ff; --callout-tip: #6cc191; --cal
 
 /* ── footer ── */
 .site-footer { border-top: 1px solid var(--border); }
-.footer-inner { padding: 26px 0 44px; font-size: 13px; color: var(--faint); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.footer-inner { padding-top: 26px; padding-bottom: 44px; font-size: 13px; color: var(--faint); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .footer-inner .colophon { font-family: var(--font-mono); }
 .site-footer a { color: var(--muted); text-decoration: none; transition: color 0.15s; }
 .site-footer a:hover { color: var(--accent); }
