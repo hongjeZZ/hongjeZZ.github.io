@@ -19,19 +19,21 @@ layout: default
     {%- if _is.size > 1 -%}{%- assign thumb = _is[1] | split: '"' | first -%}{%- endif -%}
   {%- endif -%}
   <a class="entry" href="{{ post.url | relative_url }}">
-    <time class="entry-date" datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%m.%d" }}</time>
     <span class="entry-body">
       <span class="entry-title">{{ post.title }}</span>
+      <span class="entry-meta">
+        <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y.%m.%d" }}</time>
+        {%- if post.categories.size > 0 -%}<span class="entry-cat">· {{ post.categories | join: "/" }}</span>{%- endif -%}
+      </span>
       {%- if post.excerpt -%}
-      <span class="entry-ex">{{ post.excerpt | strip_html | strip_newlines | truncate: 84 }}</span>
+      <span class="entry-ex">{{ post.excerpt | strip_html | strip_newlines | truncate: 200 }}</span>
       {%- endif -%}
     </span>
     {%- if thumb != '' -%}
-    <img class="entry-thumb" src="{{ thumb }}" alt="" loading="lazy" width="48" height="48">
+    <img class="entry-thumb" src="{{ thumb }}" alt="" loading="lazy">
     {%- else -%}
-    <img class="entry-thumb entry-thumb--default" src="{{ '/favicon.svg' | relative_url }}" alt="" loading="lazy" width="48" height="48">
+    <img class="entry-thumb entry-thumb--default" src="{{ '/favicon.svg' | relative_url }}" alt="" loading="lazy">
     {%- endif -%}
-    <span class="entry-arrow" aria-hidden="true">→</span>
   </a>
   {%- endfor -%}
   {%- endfor -%}

@@ -122,9 +122,25 @@ main.wrap { padding-bottom: 72px; flex: 1 0 auto; width: 100%; }
 .entry-ex { font-size: 12.5px; color: var(--muted); }
 .entry-arrow { align-self: center; color: var(--accent); opacity: 0; transition: opacity 0.15s ease, transform 0.15s ease; }
 .entry:hover .entry-arrow { opacity: 1; transform: translateX(3px); }
-.entry-thumb { flex: none; align-self: center; width: 48px; height: 48px; border-radius: 9px; object-fit: cover; background: var(--surface); border: 1px solid var(--border); }
-.entry-thumb--default { object-fit: contain; padding: 11px; }
-@media (max-width: 600px) { .entry-thumb { width: 42px; height: 42px; } .entry-thumb--default { padding: 9px; } }
+.entry-thumb { flex: none; align-self: center; border-radius: 11px; object-fit: cover; background: var(--surface); border: 1px solid var(--border); }
+.entry-thumb--default { object-fit: contain; }
+.entry-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 7px; font-family: var(--font-mono); font-size: 12px; color: var(--faint); }
+.entry-cat { color: var(--faint); }
+
+/* 홈 글 목록: 우측 큰 이미지 카드 스타일 */
+#post-list .entry { align-items: center; gap: 24px; padding: 15px 14px; margin: 0 -14px; }
+#post-list .entry-body { gap: 8px; }
+#post-list .entry-title { font-size: 17px; font-weight: 600; line-height: 1.4; }
+#post-list .entry-ex { font-size: 13.5px; line-height: 1.6; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+#post-list .entry-thumb { width: 208px; height: 128px; }
+#post-list .entry-thumb--default { padding: 42px; }
+@media (max-width: 680px) {
+  #post-list .entry { gap: 14px; padding: 13px 12px; margin: 0 -12px; }
+  #post-list .entry-title { font-size: 15px; }
+  #post-list .entry-ex { -webkit-line-clamp: 2; line-clamp: 2; font-size: 13px; }
+  #post-list .entry-thumb { width: 116px; height: 80px; }
+  #post-list .entry-thumb--default { padding: 24px; }
+}
 
 /* ── post detail ── */
 .post-header { margin: 0 0 22px; }
