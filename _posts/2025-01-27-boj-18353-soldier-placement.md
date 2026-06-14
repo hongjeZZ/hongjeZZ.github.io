@@ -2,7 +2,7 @@
 title: "[BOJ/Silver2] 18353번 병사 배치하기 - JAVA[자바]"
 date: 2025-01-27 21:56:37 +0900
 categories: [PS, 백준]
-tags: [DP, Lis]
+tags: [DP, LIS]
 ---
 
 **난이도** : 실버 2

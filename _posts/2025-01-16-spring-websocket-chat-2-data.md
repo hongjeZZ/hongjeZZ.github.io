@@ -2,7 +2,7 @@
 title: "[Spring boot] WebSocket 을 사용하여 채팅 서비스 구현하기(2) - 채팅 데이터베이스 설계하기"
 date: 2025-01-16 23:29:38 +0900
 categories: [Back-End, Spring]
-tags: [Spring, Stomp, 웹소켓]
+tags: [Spring, STOMP, 웹소켓]
 ---
 
 ## 들어가며

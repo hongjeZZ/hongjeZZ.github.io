@@ -2,7 +2,7 @@
 title: "[Spring boot] WebSocket 을 사용하여 채팅 서비스 구현하기(1) - 웹소켓(WebSocket), STOMP 이해하기"
 date: 2025-01-13 18:35:13 +0900
 categories: [Back-End, Spring]
-tags: [Stomp, 네트워크, 웹소켓]
+tags: [STOMP, 네트워크, 웹소켓]
 ---
 
 ## 들어가며

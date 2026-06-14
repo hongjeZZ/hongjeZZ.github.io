@@ -37,18 +37,6 @@ description: 글을 태그별로 모아 봅니다.
     var groups = Array.prototype.slice.call(document.querySelectorAll('.tag-group'));
     if (!chips.length) return;
 
-    // ── 클라우드: 글 수 → 폰트 크기(12px~20px) 매핑 ──
-    var counts = chips.map(function (c) { return parseInt(c.dataset.count, 10) || 1; });
-    var min = Math.min.apply(null, counts);
-    var max = Math.max.apply(null, counts);
-    var MIN_PX = 12, MAX_PX = 20;
-    chips.forEach(function (c) {
-      var n = parseInt(c.dataset.count, 10) || 1;
-      var px = max === min ? (MIN_PX + MAX_PX) / 2
-        : MIN_PX + (n - min) / (max - min) * (MAX_PX - MIN_PX);
-      c.style.fontSize = px.toFixed(1) + 'px';
-    });
-
     // ── 그룹별 클라이언트 페이지네이션 ──
     function paginate(group) {
       var list = group.querySelector('.tag-group-list');

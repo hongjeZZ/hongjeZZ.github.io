@@ -311,9 +311,9 @@ html[data-theme="dark"] { --callout-note: #8aa0ff; --callout-tip: #6cc191; --cal
 /* ════════════════════════════════════════════════
    tags page — interactive keyword cloud
    ════════════════════════════════════════════════ */
-/* 클라우드 변형: 칩 폰트 크기는 JS가 글 수에 따라 12~20px로 지정 */
-.tag-cloud--cloud { align-items: baseline; gap: 10px 11px; margin: 22px 0 26px; line-height: 1.5; }
-.tag-chip--cloud { line-height: 1.2; padding: 5px 13px; }
+/* 키워드 칩: 전부 동일 크기(빈도별 폰트 스케일링 제거) */
+.tag-cloud--cloud { align-items: baseline; gap: 9px 10px; margin: 22px 0 26px; line-height: 1.5; }
+.tag-chip--cloud { font-size: 13.5px; line-height: 1.2; padding: 6px 13px; }
 .tag-chip--cloud .tag-chip-count { font-size: 0.8em; }
 
 /* 태그 그룹: mono 키워드 헤더 — category(sans·굵게)와 글꼴 대비로 차별화 */

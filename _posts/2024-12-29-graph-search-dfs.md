@@ -2,7 +2,7 @@
 title: "그래프 탐색 알고리즘 - 깊이 우선 탐색 [DFS]"
 date: 2024-12-29 23:16:12 +0900
 categories: [PS, 알고리즘]
-tags: [dfs, 그래프 이론, 스택]
+tags: [DFS, 그래프 이론, 스택]
 ---
 
 ## **깊이 우선 탐색(DFS, Depth-First Search)**
