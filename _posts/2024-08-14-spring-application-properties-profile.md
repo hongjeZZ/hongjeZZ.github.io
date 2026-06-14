@@ -1,5 +1,5 @@
 ---
-title: "[Spring] application.properties 및 Profile 설정"
+title: application.properties 및 Profile 설정
 date: 2024-08-14 14:30:18 +0900
 categories: [Back-End, Spring]
 tags: [Spring]

@@ -1,5 +1,5 @@
 ---
-title: "[Spring Boot] WebSocket 을 사용하여 채팅 서비스 구현하기(4) - 채팅 서비스 성능 개선 및 부하 테스트"
+title: WebSocket 을 사용하여 채팅 서비스 구현하기(4) - 채팅 서비스 성능 개선 및 부하 테스트
 date: 2025-02-14 20:26:03 +0900
 categories: [Back-End, Spring]
 tags: [JMeter, Redis, Spring]

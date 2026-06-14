@@ -1,5 +1,5 @@
 ---
-title: "[Spring Boot] MongoDB LocalDateTime 저장 시 UTC로 저장되는 문제"
+title: MongoDB LocalDateTime 저장 시 UTC로 저장되는 문제
 date: 2025-02-24 16:37:26 +0900
 categories: [Back-End, Spring]
 tags: [MongoDB, Spring Boot, ZonedDateTime]

@@ -1,7 +1,7 @@
 ---
 title: "그래프 탐색 알고리즘 - 너비 우선 탐색 [BFS]"
 date: 2024-12-31 22:50:47 +0900
-categories: [PS, 알고리즘]
+categories: [CS, 알고리즘]
 tags: [BFS, 그래프 이론, 큐]
 ---
 

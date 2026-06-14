@@ -1,5 +1,5 @@
 ---
-title: "[Spring Boot] MongoDB와  MySQL의 이기종 트랜잭션 문제 해결"
+title: MongoDB와  MySQL의 이기종 트랜잭션 문제 해결
 date: 2025-02-25 22:53:07 +0900
 categories: [Back-End, Spring]
 tags: [MongoDB, Spring Boot, 트랜잭션]

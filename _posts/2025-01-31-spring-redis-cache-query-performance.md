@@ -1,5 +1,5 @@
 ---
-title: "[Spring boot] Redis Cache를 적용한 조회 성능 개선"
+title: Redis Cache를 적용한 조회 성능 개선
 date: 2025-01-31 21:57:45 +0900
 categories: [Back-End, Spring]
 tags: [Cache, Redis, Spring]

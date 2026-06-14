@@ -1,7 +1,7 @@
 ---
-title: "[TIL] 메모리 계층 구조"
+title: 메모리 계층 구조
 date: 2025-03-13 21:36:21 +0900
-categories: [CS, 컴퓨터구조]
+categories: [TIL]
 tags: [CS, 운영체제, 컴퓨터구조]
 ---
 

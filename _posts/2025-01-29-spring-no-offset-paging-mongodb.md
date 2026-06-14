@@ -1,5 +1,5 @@
 ---
-title: "[Spring boot] No Offset 적용한 페이징 성능 개선 - MongoDB"
+title: No Offset 적용한 페이징 성능 개선 - MongoDB
 date: 2025-01-29 23:59:45 +0900
 categories: [Back-End, Spring]
 tags: [MongoDB, Spring]

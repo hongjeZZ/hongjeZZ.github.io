@@ -1,5 +1,5 @@
 ---
-title: "[Spring boot] MySQL &rarr; MongoDB 마이그레이션 과정"
+title: "MySQL &rarr; MongoDB 마이그레이션 과정"
 date: 2025-01-27 17:22:23 +0900
 categories: [Back-End, Spring]
 tags: [MongoDB, Spring]

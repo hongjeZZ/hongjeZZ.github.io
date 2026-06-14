@@ -1,5 +1,5 @@
 ---
-title: "[Spring boot] WebSocket 을 사용하여 채팅 서비스 구현하기(3) - STOMP를 사용하여 실시간 채팅 구현 (비동기 처리)"
+title: WebSocket 을 사용하여 채팅 서비스 구현하기(3) - STOMP를 사용하여 실시간 채팅 구현 (비동기 처리)
 date: 2025-01-21 22:03:30 +0900
 categories: [Back-End, Spring]
 tags: [STOMP, 웹소켓]

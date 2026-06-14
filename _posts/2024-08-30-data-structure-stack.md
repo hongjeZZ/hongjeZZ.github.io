@@ -1,5 +1,5 @@
 ---
-title: "[자료구조] 스택(Stack) 정리"
+title: 스택(Stack) 정리
 date: 2024-08-30 14:26:02 +0900
 categories: [CS, 자료구조]
 tags: [스택, 자료구조, 코딩테스트]

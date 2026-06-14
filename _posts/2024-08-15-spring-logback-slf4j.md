@@ -1,5 +1,5 @@
 ---
-title: "[Spring] Loggig 과 Logback 설정, 그리고 SLF4J"
+title: "Loggig 과 Logback 설정, 그리고 SLF4J"
 date: 2024-08-15 15:27:31 +0900
 categories: [Back-End, Spring]
 tags: [Spring, logback]
