@@ -1,8 +1,8 @@
 ---
 title: 메모리 계층 구조
 date: 2025-03-13 21:36:21 +0900
-categories: [TIL]
-tags: [CS, 운영체제, 컴퓨터구조]
+categories: [CS, 컴퓨터구조]
+tags: [TIL, CS, 운영체제, 컴퓨터구조]
 ---
 
 ## 메모리 계층 구조
