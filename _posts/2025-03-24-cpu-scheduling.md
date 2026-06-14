@@ -1,7 +1,7 @@
 ---
 title: CPU 스케줄링
 date: 2025-03-24 17:22:11 +0900
-categories: [CS, 운영체제]
+categories: [CS, 시스템]
 tags: [TIL, 운영체제]
 ---
 

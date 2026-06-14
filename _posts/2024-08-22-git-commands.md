@@ -1,7 +1,7 @@
 ---
 title: 자주 사용하는 명령어 모음
 date: 2024-08-22 23:20:52 +0900
-categories: [개발, Git]
+categories: [기타]
 tags: [TIL, cli, git]
 ---
 

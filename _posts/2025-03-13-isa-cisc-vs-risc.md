@@ -1,7 +1,7 @@
 ---
 title: "명령어 집합 구조(ISA), CISC vs RISC"
 date: 2025-03-13 20:27:54 +0900
-categories: [CS, 컴퓨터구조]
+categories: [CS, 시스템]
 tags: [TIL, CS, 운영체제, 컴퓨터구조]
 ---
 
