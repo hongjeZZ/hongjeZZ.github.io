@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# 로컬 미리보기 — http://localhost:4000 (파일 저장 시 자동 새로고침)
+# Docker로 CI와 동일한 Ruby 3.4 환경에서 jekyll serve. 시스템 Ruby 불필요.
+# 사용: ./bin/serve   (Ctrl+C 로 종료)
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+if ! docker info >/dev/null 2>&1; then
+  echo "❌ Docker 데몬이 꺼져 있습니다. Docker Desktop을 실행한 뒤(메뉴바 고래 아이콘) 다시 시도하세요." >&2
+  echo "   (또는: open -a Docker)" >&2
+  exit 1
+fi
+
+echo "▶ http://localhost:4000  — 첫 실행은 gem 설치로 1~2분 걸립니다. (Ctrl+C 종료)"
+exec docker run --rm -it \
+  -e JEKYLL_ENV=development \
+  -v "$PWD:/srv/jekyll" \
+  -v "$PWD/.bundle-cache:/usr/local/bundle" \
+  -p 4000:4000 -p 35729:35729 \
+  -w /srv/jekyll \
+  ruby:3.4 \
+  bash -lc "bundle install --quiet && bundle exec jekyll serve --host 0.0.0.0 --livereload --force_polling"

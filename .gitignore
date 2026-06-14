@@ -28,3 +28,6 @@ assets/js/dist
 
 # Claude Code 로컬 작업 파일 (공개 금지)
 .claude/
+
+# Docker 로컬 빌드 gem 캐시
+.bundle-cache/

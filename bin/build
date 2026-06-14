@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# 푸시 전 검증 — CI(.github/workflows/pages-deploy.yml)와 동일하게
+# 프로덕션 빌드 + htmlproofer(깨진 링크·이미지 검사)를 로컬에서 그대로 실행.
+# 사용: ./bin/build   (통과하면 CI도 통과할 가능성이 높음)
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+if ! docker info >/dev/null 2>&1; then
+  echo "❌ Docker 데몬이 꺼져 있습니다. Docker Desktop을 실행한 뒤 다시 시도하세요." >&2
+  exit 1
+fi
+
+docker run --rm \
+  -v "$PWD:/srv/jekyll" \
+  -v "$PWD/.bundle-cache:/usr/local/bundle" \
+  -w /srv/jekyll \
+  ruby:3.4 \
+  bash -lc "bundle install --quiet \
+    && JEKYLL_ENV=production bundle exec jekyll build -d _site \
+    && bundle exec htmlproofer _site --disable-external --ignore-urls '/^http:\/\/127.0.0.1/,/^http:\/\/0.0.0.0/,/^http:\/\/localhost/'"
+
+echo "✅ 빌드 + htmlproofer 통과 — 푸시해도 CI 통과 예상"
