@@ -9,9 +9,9 @@
   --code-bg: #ece6d8;
   --shadow: 0 10px 30px rgba(20, 20, 30, 0.10);
 
-  --font-sans: 'SUIT Variable', SUIT, -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif;
+  --font-sans: '42dot Sans', -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif;
   --font-serif: var(--font-sans);
-  --font-mono: 'Monaspace Neon', 'SUIT Variable', ui-monospace, Menlo, monospace;
+  --font-mono: 'JetBrains Mono', '42dot Sans', ui-monospace, Menlo, monospace;
 }
 html[data-theme="dark"] {
   --bg: #16161a;
