@@ -31,3 +31,6 @@ assets/js/dist
 
 # Docker 로컬 빌드 gem 캐시
 .bundle-cache/
+
+# blog-publish 워크플로 스크래치 (초안·리포트 — 발행 전 임시)
+.pipeline/
