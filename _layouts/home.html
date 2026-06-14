@@ -25,14 +25,15 @@ layout: default
         <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y.%m.%d" }}</time>
         {%- if post.categories.size > 0 -%}<span class="entry-cat">· {{ post.categories | join: "/" }}</span>{%- endif -%}
       </span>
-      {%- if post.excerpt -%}
-      <span class="entry-ex">{{ post.excerpt | strip_html | strip_newlines | truncate: 200 }}</span>
+      {%- assign preview = post.content | strip_html | strip_newlines | truncate: 240 -%}
+      {%- if preview != '' -%}
+      <span class="entry-ex">{{ preview }}</span>
       {%- endif -%}
     </span>
     {%- if thumb != '' -%}
-    <img class="entry-thumb" src="{{ thumb }}" alt="" loading="lazy">
+    <img class="entry-thumb" src="{{ thumb }}" alt="" loading="lazy" width="208" height="128">
     {%- else -%}
-    <img class="entry-thumb entry-thumb--default" src="{{ '/favicon.svg' | relative_url }}" alt="" loading="lazy">
+    <img class="entry-thumb entry-thumb--default" src="{{ '/favicon.svg' | relative_url }}" alt="" loading="lazy" width="208" height="128">
     {%- endif -%}
   </a>
   {%- endfor -%}
