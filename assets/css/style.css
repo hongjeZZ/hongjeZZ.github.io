@@ -55,6 +55,10 @@ body {
   .post-toc { display: block; position: absolute; top: 30px; bottom: 0; left: -186px; width: 160px; }
   .post-toc #toc-mount { display: block; position: sticky; top: 26px; max-height: calc(100vh - 52px); overflow-y: auto; }
 }
+/* 넓은 화면에선 목차를 좌측으로 약 30% 더 넓게 (좁은 화면은 위 160px 유지 → 회귀 없음) */
+@media (min-width: 1400px) {
+  .post-toc { left: -232px; width: 208px; }
+}
 
 /* ── header / nav ── */
 .site-header { padding-top: 22px; border-bottom: 1px solid var(--border); }
