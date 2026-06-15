@@ -57,7 +57,7 @@ body {
 }
 /* 넓은 화면에선 목차를 좌측으로 약 30% 더 넓게 (좁은 화면은 위 160px 유지 → 회귀 없음) */
 @media (min-width: 1400px) {
-  .post-toc { left: -232px; width: 208px; }
+  .post-toc { left: -260px; width: 240px; }
 }
 
 /* ── header / nav ── */
