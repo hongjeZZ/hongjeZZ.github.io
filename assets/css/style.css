@@ -151,9 +151,12 @@ main.wrap { padding-bottom: 72px; flex: 1 0 auto; width: 100%; }
 
 .post-content { font-size: 15px; line-height: 1.62; }
 .post-content > *:first-child { margin-top: 0; }
-.post-content h2 { font-family: var(--font-serif); font-weight: 600; font-size: 18px; letter-spacing: -0.3px; line-height: 1.4; margin: 1.5em 0 0.45em; }
+.post-content h2 { font-family: var(--font-serif); font-weight: 600; font-size: 18px; letter-spacing: -0.3px; line-height: 1.4; margin: 2.4em 0 0.5em; }
 .post-content h2::before { content: ''; display: block; width: 24px; height: 2px; background: var(--accent); margin-bottom: 11px; }
-.post-content h3 { font-family: var(--font-serif); font-weight: 600; font-size: 16px; margin: 1.3em 0 0.4em; }
+.post-content h3 { font-family: var(--font-serif); font-weight: 600; font-size: 16px; margin: 2em 0 0.45em; }
+.post-content h4 { font-family: var(--font-serif); font-weight: 600; font-size: 15px; letter-spacing: -0.2px; line-height: 1.45; margin: 1.8em 0 0.4em; color: var(--text); }
+.post-content h5 { font-family: var(--font-serif); font-weight: 600; font-size: 14px; margin: 1.7em 0 0.35em; color: var(--muted); }
+.post-content h6 { font-family: var(--font-serif); font-weight: 700; font-size: 12.5px; letter-spacing: 0.04em; text-transform: uppercase; margin: 1.6em 0 0.35em; color: var(--faint); }
 .post-content p { margin: 0 0 0.9em; }
 .post-content a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--border); transition: border-color 0.15s; }
 .post-content a:hover { border-bottom-color: var(--accent); }
@@ -241,7 +244,7 @@ html[data-theme="dark"] { --callout-note: #8aa0ff; --callout-tip: #6cc191; --cal
 .toc a { display: block; font-size: 12.5px; line-height: 1.45; color: var(--muted); text-decoration: none; padding: 4px 0 4px 14px; margin-left: -1px; border-left: 2px solid transparent; transition: color 0.15s ease, border-color 0.15s ease; }
 .toc a:hover { color: var(--accent); }
 .toc a.active { color: var(--accent); border-left-color: var(--accent); }
-.post-content h2, .post-content h3 { scroll-margin-top: 26px; }
+.post-content h2, .post-content h3, .post-content h4, .post-content h5, .post-content h6 { scroll-margin-top: 26px; }
 
 /* ── heading anchor ── */
 .heading-anchor { margin-left: 8px; color: var(--faint); text-decoration: none; font-weight: 400; opacity: 0; transition: opacity 0.15s ease, color 0.15s ease; }
