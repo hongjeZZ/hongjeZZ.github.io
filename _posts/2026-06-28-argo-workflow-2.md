@@ -7,6 +7,8 @@ source_wiki: argo-workflows-advanced
 provenance: cite-only
 ---
 
+![Argo Workflows](/assets/img/argo-workflows/cover.png)
+
 {% raw %}
 이 글은 [Argo Workflows](https://argoproj.github.io/argo-workflows/) 공식 문서와 Alibaba Cloud·CNOE·Pipekit 기술 블로그를 읽고 정리한 노트입니다. [핵심 아키텍처 편](/posts/argo-workflow/)에 이어, 재시도 전략·동시성 제어·메모이제이션·보안 RBAC·성능 튜닝 같은 고급 운영 패턴을 공식 스키마와 예제 YAML 중심으로 옮겼습니다. v3.5~v3.6에서 추가된 기능까지 포함합니다.
 

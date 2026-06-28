@@ -7,6 +7,8 @@ source_wiki: argo-workflows-core
 provenance: cite-only
 ---
 
+![Argo Workflows](/assets/img/argo-workflows/cover.png)
+
 {% raw %}
 이 글은 [Argo Workflows](https://argoproj.github.io/argo-workflows/) 공식 문서를 읽고 정리한 노트입니다. 컨트롤러·CRD·템플릿 타입·Executor·아티팩트·아카이브까지 핵심 구성요소를 공식 스키마와 예제 YAML 중심으로 옮겼습니다. 재시도·동시성·메모이제이션·보안·성능 같은 심화 운영 패턴은 [고급 운영 편](/posts/argo-workflow-2/)에서 다룹니다.
 
