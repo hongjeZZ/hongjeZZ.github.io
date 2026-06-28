@@ -1,5 +1,5 @@
 ---
-title: "Argo Workflows 핵심 아키텍처 정리"
+title: "Argo Workflows 핵심 아키텍처 정리 - 1"
 date: 2026-06-21 14:04:24 +0900
 categories: [Infra, Kubernetes]
 tags: [TIL, Argo Workflows, Kubernetes, CRD, 워크플로우]
@@ -8,7 +8,7 @@ provenance: cite-only
 ---
 
 {% raw %}
-이 글은 [Argo Workflows](https://argoproj.github.io/argo-workflows/) 공식 문서를 읽고 정리한 노트입니다. 컨트롤러·CRD·템플릿 타입·Executor·아티팩트·아카이브까지 핵심 구성요소를 공식 스키마와 예제 YAML 중심으로 옮겼습니다.
+이 글은 [Argo Workflows](https://argoproj.github.io/argo-workflows/) 공식 문서를 읽고 정리한 노트입니다. 컨트롤러·CRD·템플릿 타입·Executor·아티팩트·아카이브까지 핵심 구성요소를 공식 스키마와 예제 YAML 중심으로 옮겼습니다. 재시도·동시성·메모이제이션·보안·성능 같은 심화 운영 패턴은 [고급 운영 편](/posts/argo-workflow-2/)에서 다룹니다.
 
 Argo Workflows는 [Kubernetes](https://kubernetes.io/) 위에서 컨테이너 기반 워크플로우를 오케스트레이션하는 오픈소스 엔진입니다. Kubernetes [CRD(Custom Resource Definition)](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/)로 구현되어 [Operator 패턴](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/)을 그대로 활용하며, ML 파이프라인·배치 데이터 처리·CI/CD처럼 병렬 잡 실행이 필요한 도메인에서 사용됩니다. 최신 안정 버전은 v3.6.x이고, v4.0.0이 2026년 2월 GA로 릴리스됐습니다.
 
