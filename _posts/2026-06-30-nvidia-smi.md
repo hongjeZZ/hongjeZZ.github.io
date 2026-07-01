@@ -7,6 +7,8 @@ source_wiki: nvidia-smi
 provenance: cite-only
 ---
 
+![NVIDIA](/assets/img/nvidia-smi/cover.png)
+
 이 글은 [NVIDIA 공식 문서](https://docs.nvidia.com/deploy/nvidia-smi/)(nvidia-smi 레퍼런스, MIG User Guide, Driver Persistence, DCGM, NVIDIA Container Toolkit)를 정리한 것입니다. `nvidia-smi`의 기본 출력 필드, 쿼리 모드, 모니터링·관리 명령, MIG, 토폴로지, 종료 코드까지를 다룹니다.
 
 ## nvidia-smi의 정체
