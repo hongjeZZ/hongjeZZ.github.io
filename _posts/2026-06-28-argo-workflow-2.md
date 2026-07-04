@@ -1,8 +1,8 @@
 ---
-title: "Argo Workflows 핵심 아키텍처 정리 - 2"
-date: 2026-06-28 13:24:00 +0900
+title: "Argo Workflows 고급 운영 패턴 정리 - 2"
+date: 2026-06-28 14:57:01 +0900
 categories: [Infra, Kubernetes]
-tags: [TIL, Argo Workflows, Kubernetes, 재시도, 메모이제이션, RBAC]
+tags: [TIL, Argo Workflows, Kubernetes, 재시도, 동시성, 메모이제이션, RBAC]
 source_wiki: argo-workflows-advanced
 provenance: cite-only
 ---
@@ -10,16 +10,21 @@ provenance: cite-only
 ![Argo Workflows](/assets/img/argo-workflows/cover.png)
 
 {% raw %}
-이 글은 [Argo Workflows](https://argoproj.github.io/argo-workflows/) 공식 문서와 Alibaba Cloud·CNOE·Pipekit 기술 블로그를 읽고 정리한 노트입니다. [핵심 아키텍처 편](/posts/argo-workflow/)에 이어, 재시도 전략·동시성 제어·메모이제이션·보안 RBAC·성능 튜닝 같은 고급 운영 패턴을 공식 스키마와 예제 YAML 중심으로 옮겼습니다. v3.5~v3.6에서 추가된 기능까지 포함합니다.
 
-> [!NOTE] 사전지식
-> 이 글은 Argo Workflows의 Workflow·WorkflowTemplate·CronWorkflow 같은 CRD와 steps/dag 템플릿 개념을 안다고 가정합니다. 생소하다면 [핵심 아키텍처 편](/posts/argo-workflow/)을 먼저 보면 좋습니다.
+[Argo Workflows](https://argo-workflows.readthedocs.io/en/latest/)를 프로덕션에서 운영하려면 워크플로우를 정의하는 것 이상이 필요합니다. 스텝이 실패했을 때 어떻게 재시도할지, 동시에 몇 개까지 돌릴지, 비싼 연산 결과를 어떻게 캐시할지, 누구에게 어떤 권한을 줄지, 컨트롤러가 대규모 부하에서 버티도록 어떻게 튜닝할지 — 이런 운영 관심사가 별도의 설정 레이어로 존재합니다.
 
-## 재시도 및 오류 처리
+이 글은 Argo Workflows 공식 문서의 운영 패턴을 정리한 노트입니다. 재시도·오류 처리, 동시성 제어(Mutex·Semaphore), 메모이제이션, 보안·RBAC, 성능·스케일링을 실제 YAML과 함께 다룹니다. 컨트롤러·CRD·템플릿 타입 같은 기본 아키텍처는 [1편](/posts/argo-workflow/)에서 다뤘습니다. 아래 내용은 v3.5~v3.6에서 추가된 기능까지 포함합니다.
+
+> [!NOTE] 전제 지식
+> Workflow·WorkflowTemplate·CronWorkflow 같은 CRD의 기본 구조와 템플릿(Container·Script·Steps·DAG) 개념을 안다고 가정합니다. 이 개념들은 [1편](/posts/argo-workflow/)에서 정리했습니다.
+
+## 재시도와 오류 처리
+
+스텝은 여러 이유로 실패합니다. 컨테이너가 비정상 종료 코드로 끝나기도 하고, 노드가 드레인되거나 스팟 인스턴스가 회수되기도 하며, 네트워크나 외부 API가 일시적으로 흔들리기도 합니다. `retryStrategy`는 이런 실패를 어떤 조건에서 몇 번, 얼마의 간격으로 다시 시도할지 선언하는 필드입니다. 단순한 횟수 제한을 넘어 종료 코드·상태·실행 시간·오류 메시지를 조합한 조건부 재시도(v3.2+)와 지수 백오프를 함께 걸 수 있습니다.
 
 ### retryStrategy 전체 필드
 
-`retryStrategy`는 템플릿 레벨에서 재시도 동작을 정의합니다. 필드별 의미는 주석에 달았습니다.
+`retryStrategy`는 템플릿 레벨에 붙습니다. 재시도 횟수 상한, 재시도 정책, 백오프, 재시도 노드 배치까지 한 블록에 담깁니다.
 
 ```yaml
 apiVersion: argoproj.io/v1alpha1
@@ -45,9 +50,11 @@ spec:
       args: ["exit 1"]
 ```
 
+`backoff.duration`은 필수이며 첫 재시도까지 대기하는 시간입니다. `factor`가 지수 배율이고 `maxDuration`이 대기 시간 상한입니다. `affinity.nodeAntiAffinity`를 두면 재시도가 실패한 노드를 피해 다른 노드에서 실행됩니다.
+
 ### retryPolicy 옵션 비교
 
-`retryPolicy`는 어떤 경우를 재시도 대상으로 볼지 결정합니다. 네 가지 값이 있습니다.
+`retryPolicy`는 어떤 종류의 실패를 재시도 대상으로 볼지 정합니다. 네 가지 값이 있고, 무엇을 잡느냐가 다릅니다.
 
 | 값 | 설명 | 사용 시점 |
 |---|---|---|
@@ -56,9 +63,11 @@ spec:
 | `OnError` | Argo 컨트롤러 오류, init/wait 컨테이너 실패 | 인프라 문제 처리 |
 | `OnTransientError` | 일시적 오류(v3.0+), `TRANSIENT_ERROR_PATTERN` env 패턴 매칭 | 네트워크·API 일시 오류 |
 
+`OnFailure`가 기본값으로 컨테이너가 비정상 종료 코드로 끝난 경우만 재시도합니다. `OnError`는 컨트롤러 오류나 init/wait 컨테이너 실패 같은 인프라 문제를 잡습니다. `OnTransientError`는 v3.0에서 추가됐고 `TRANSIENT_ERROR_PATTERN` 환경 변수의 패턴에 매칭되는 오류를 일시적 오류로 분류합니다.
+
 ### expression 기반 조건부 재시도 (v3.2+)
 
-v3.2부터는 `expression` 필드로 종료 코드·상태·실행 시간·오류 메시지를 조합해 재시도를 세밀하게 제어합니다. expression에서 쓸 수 있는 변수는 다음과 같습니다.
+`expression` 필드는 v3.2에서 추가됐고, 종료 코드·상태·실행 시간·오류 메시지를 조합해 재시도 여부를 세밀하게 결정합니다. 표현식에서 쓸 수 있는 변수는 네 가지입니다.
 
 | 변수 | 타입 | 설명 |
 |---|---|---|
@@ -80,15 +89,15 @@ retryStrategy:
     maxDuration: "10m"
 ```
 
-자주 쓰는 expression 패턴은 다음과 같습니다.
+`expression`을 지정하면 `retryPolicy`를 `Always`로 두는 것이 권장됩니다(v3.5부터 이때 기본값이 `Always`로 바뀌었습니다). 실무에서 자주 쓰는 표현식은 다음과 같습니다.
 
 - `asInt(lastRetry.exitCode) == 1` — 종료 코드 1에서만 재시도
 - `lastRetry.duration < "300"` — 300초 미만 실행 시에만 재시도 (무한 루프 방지)
 - `"OOM" in lastRetry.message` — OOM 오류 메시지 포함 시 재시도 (v3.5+)
 
-### onExit 핸들러
+### onExit 핸들러 — 항상 실행되는 후처리
 
-`onExit`에 지정한 템플릿은 워크플로우가 성공·실패·오류 어느 경우에도 실행됩니다. 알림 발송, 리소스 정리, 감사 로그 같은 후처리에 사용합니다.
+`onExit` 핸들러는 워크플로우가 성공·실패·오류 어느 경우에도 실행되는 후처리 템플릿입니다. 알림 발송, 리소스 정리, 감사 로그를 남길 때 사용합니다. 핸들러 안에서 `{{workflow.status}}` 변수로 성공/실패를 분기합니다.
 
 ```yaml
 apiVersion: argoproj.io/v1alpha1
@@ -123,11 +132,9 @@ spec:
       args: ["echo 'Workflow {{workflow.name}} ended with {{workflow.status}}'"]
 ```
 
-`{{workflow.status}}` 변수로 성공/실패 분기를 처리합니다.
+### failFast — 병렬 실패 시 즉시 중단
 
-### failFast 동작
-
-`failFast`는 병렬 단계 중 하나가 실패할 때 전체 워크플로우를 즉시 중단할지 제어합니다. `steps`/`dag` 템플릿에서 기본값이 `true`입니다. 병렬 실행 중 하나가 실패하면 나머지가 즉시 취소됩니다. 이를 비활성화하려면 각 태스크에 `continueOn.failed: true`를 사용합니다.
+`failFast`는 병렬 실행 중 하나가 실패했을 때 나머지를 즉시 취소할지 정합니다. `steps`/`dag` 템플릿에서 **기본값이 `true`**이므로, 병렬 태스크 하나가 실패하면 나머지가 자동으로 취소됩니다. 이 동작을 끄려면 각 태스크에 `continueOn.failed: true`를 지정합니다.
 
 ```yaml
 templates:
@@ -146,9 +153,9 @@ spec:
   activeDeadlineSeconds: 300
 ```
 
-### Pod Disruption 처리
+### Pod Disruption 처리 — 스팟 인스턴스·노드 드레인
 
-노드 드레인이나 스팟 인스턴스 중단 같은 Pod Disruption 시나리오에서는 `retryPolicy: "OnError"`를 쓰면 컨트롤러가 Pod 실패를 Error로 감지해 재시도합니다. 워크플로우 레벨에서 PodDisruptionBudget도 설정할 수 있습니다.
+노드 드레인이나 스팟 인스턴스 회수는 명시적 실패가 아니라 중단입니다. 이런 중단을 일시적 오류로 분류해 자동 재시도하려면 `retryPolicy: "OnError"`와 `TRANSIENT_ERROR_PATTERN` 환경 변수를 조합합니다.
 
 ```yaml
 spec:
@@ -165,7 +172,7 @@ spec:
       args: ["sleep 300"]
 ```
 
-스팟 인스턴스 환경에서는 컨트롤러 ConfigMap의 `TRANSIENT_ERROR_PATTERN` 환경 변수로 특정 오류 패턴을 일시적 오류로 분류해, `OnTransientError`와 조합하면 노드 드레인·스팟 중단을 자동 재시도 대상으로 만들 수 있습니다.
+`TRANSIENT_ERROR_PATTERN`은 컨트롤러 ConfigMap의 executor 환경 변수로 설정합니다. 파이프로 구분한 패턴 중 하나라도 오류 메시지에 포함되면 일시적 오류로 분류됩니다.
 
 ```yaml
 # workflow-controller-configmap
@@ -179,11 +186,11 @@ data:
 
 ## 동시성 제어
 
-동시성 제어는 잠금 하나만 허용하는 Mutex와 N개까지 허용하는 Semaphore 두 종류로 나뉩니다.
+동시성 제어는 한 번에 실행되는 워크플로우나 스텝의 수를 제한하는 장치입니다. 공유 데이터베이스 마이그레이션처럼 동시에 하나만 돌아야 하는 작업, 또는 외부 시스템 부하 때문에 동시 실행 수를 N개로 묶어야 하는 작업에 씁니다. 잠금은 한 번에 하나만 허용하는 Mutex와 N개까지 허용하는 Semaphore 두 종류로 나뉩니다.
 
 ### Mutex — 단일 잠금
 
-Mutex는 동시에 하나의 워크플로우/템플릿만 실행되도록 보장합니다. ConfigMap이 필요 없고 이름만 지정합니다.
+Mutex는 동시에 워크플로우 또는 템플릿 하나만 실행되도록 보장합니다. Semaphore와 달리 ConfigMap이 필요 없고 이름만 지정하면 됩니다.
 
 ```yaml
 # 워크플로우 레벨 Mutex (네임스페이스 내)
@@ -207,7 +214,7 @@ spec:
 
 ### Semaphore — N개 동시 실행 제한
 
-Semaphore는 ConfigMap에 동시 실행 수를 정의하고, 워크플로우가 그 키를 참조합니다.
+Semaphore는 동시 실행 수를 N개로 제한합니다. 허용 개수를 ConfigMap 키에 정의하고, 워크플로우가 그 키를 참조합니다.
 
 ```yaml
 # 1. ConfigMap으로 세마포어 크기 정의
@@ -243,7 +250,7 @@ spec:
 
 ### 템플릿 레벨 세마포어
 
-세마포어를 템플릿 레벨에 걸면 여러 워크플로우에 걸쳐 특정 템플릿의 동시 실행 수를 제한할 수 있습니다. 아래 예시에서 `etl-workers: "2"`로 지정하면, 어느 워크플로우에서 실행되든 `heavy-task` 템플릿은 최대 2개까지만 동시에 실행됩니다.
+Semaphore를 워크플로우가 아니라 템플릿에 걸면, 여러 워크플로우에 걸쳐 특정 템플릿의 동시 실행 수를 클러스터 전체에서 제한할 수 있습니다. 예를 들어 `etl-workers: "2"`로 지정하면, 어느 워크플로우에서 실행되든 해당 템플릿이 동시에 2개를 넘지 않습니다.
 
 ```yaml
 apiVersion: argoproj.io/v1alpha1
@@ -273,12 +280,7 @@ spec:
 
 ### 데이터베이스 기반 잠금 (멀티 컨트롤러, v3.6+)
 
-ConfigMap 기반 잠금은 단일 컨트롤러 인스턴스 내에서만 유효합니다. 여러 Argo Workflows 컨트롤러 인스턴스가 동일한 클러스터에 존재하면 컨트롤러 간 잠금이 공유되지 않습니다.
-
-> [!WARNING] 멀티 컨트롤러에서 ConfigMap 잠금은 깨진다
-> ConfigMap 기반 뮤텍스·세마포어는 잠금 상태를 컨트롤러 메모리에 들고 있습니다. HA로 컨트롤러를 여러 개 띄우거나 샤딩하면 인스턴스끼리 잠금을 모르고 동시에 임계 구역에 진입할 수 있습니다. 멀티 컨트롤러라면 아래 DB 기반 잠금을 써야 합니다.
-
-v3.6부터는 [PostgreSQL](https://www.postgresql.org/)/[MySQL](https://www.mysql.com/)을 사용해 컨트롤러 간 뮤텍스·세마포어를 공유할 수 있습니다. 동기화 설정은 컨트롤러 ConfigMap에 두고, 잠금 쪽에는 `database: true` 플래그로 DB 기반 잠금을 선택합니다.
+ConfigMap 기반 잠금은 단일 컨트롤러 안에서만 유효합니다. 여러 Argo Workflows 컨트롤러 인스턴스가 같은 클러스터에 존재하면 컨트롤러 간에 잠금이 공유되지 않습니다. v3.6부터 [PostgreSQL](https://www.postgresql.org/)/[MySQL](https://www.mysql.com/)을 잠금 저장소로 쓰면 컨트롤러 간 뮤텍스·세마포어를 공유할 수 있습니다.
 
 ```yaml
 # workflow-controller-configmap
@@ -305,7 +307,7 @@ spec:
         database: true     # 이 플래그로 DB 기반 잠금 선택
 ```
 
-DB 상태는 SQL로 직접 조회할 수 있습니다.
+`database: true` 플래그로 DB 기반 잠금을 선택합니다. `stateTableName`·`limitTableName`은 기본값이 각각 `sync_state`·`sync_limit`입니다. DB 상태는 직접 조회할 수 있습니다.
 
 ```sql
 -- 현재 잠금 대기 중인 워크플로우 확인
@@ -314,7 +316,12 @@ SELECT * FROM sync_state WHERE held = false ORDER BY priority DESC, time ASC;
 
 ### parallelism 계층 구조
 
-`parallelism`은 적용 위치에 따라 의미가 다릅니다. 워크플로우 레벨은 해당 워크플로우 내 최대 동시 Pod 수, 템플릿 레벨은 steps/dag 내 동시 실행 스텝 수를 제한합니다.
+`parallelism`은 동시 실행 수 상한을 거는 또 다른 축이며, 네 개의 계층에 각각 존재합니다. 상위 계층이 하위 전체를 덮습니다.
+
+- 컨트롤러 전역 `parallelism`: 컨트롤러 내 동시 워크플로우 수
+- `namespaceParallelism`: 네임스페이스당 동시 워크플로우 수
+- 워크플로우 레벨 `spec.parallelism`: 해당 워크플로우 내 최대 동시 Pod 수
+- 템플릿 레벨 `parallelism`: steps/dag 내 동시 실행 스텝 수
 
 ```yaml
 # 워크플로우 레벨 — 이 워크플로우 내 최대 동시 Pod 수
@@ -331,7 +338,7 @@ spec:
         withParam: "{{workflow.parameters.items}}"
 ```
 
-컨트롤러 전역 제한은 ConfigMap에서 설정합니다. 컨트롤러 내 동시 워크플로우 수와 네임스페이스당 동시 워크플로우 수를 따로 둡니다.
+컨트롤러 전역 제한은 `workflow-controller-configmap`에 둡니다.
 
 ```yaml
 data:
@@ -339,29 +346,13 @@ data:
   namespaceParallelism: "10" # 네임스페이스당 동시 워크플로우 수
 ```
 
-### Pod Priority Class
-
-워크플로우에 [Kubernetes](https://kubernetes.io/docs/concepts/) PriorityClass와 큐 우선순위를 지정할 수 있습니다. `priority`의 기본값은 0입니다.
-
-```yaml
-spec:
-  priorityClassName: high-priority   # PriorityClass 이름
-  priority: 100                       # 워크플로우 큐 우선순위 (0 기본)
-  templates:
-  - name: main
-    container:
-      image: alpine:3.18
-      command: [echo]
-      args: ["high priority job"]
-```
-
 ## 메모이제이션
 
-메모이제이션은 비용이 큰 연산의 결과를 ConfigMap에 캐시해 중복 실행을 방지합니다. Cache Hit이면 컨테이너를 실행하지 않고 저장된 output을 바로 반환합니다.
+메모이제이션은 비용이 큰 연산의 결과를 캐시해 중복 실행을 막는 기능입니다. 같은 입력으로 다시 실행되면 컨테이너를 띄우지 않고 저장된 output을 바로 반환합니다(Cache Hit). 캐시 저장소로는 ConfigMap을 씁니다. 모델 학습, 대용량 데이터 처리처럼 같은 입력에 같은 결과가 나오는 결정적 연산에 적합합니다.
 
 ### 기본 설정
 
-먼저 캐시용 ConfigMap에 `workflows.argoproj.io/configmap-type: Cache` 레이블을 붙여야 합니다.
+캐시용 ConfigMap에는 반드시 `workflows.argoproj.io/configmap-type: Cache` 레이블이 있어야 합니다.
 
 ```yaml
 # 1. 캐시용 ConfigMap 생성 (반드시 레이블 필요)
@@ -373,7 +364,7 @@ metadata:
     workflows.argoproj.io/configmap-type: Cache  # 필수 레이블
 ```
 
-템플릿에는 `memoize` 블록으로 캐시 키와 유효기간(`maxAge`), 캐시 저장소 ConfigMap을 지정합니다.
+`memoize` 블록은 캐시 키, 유효기간(`maxAge`), 캐시 저장소를 지정합니다.
 
 ```yaml
 # 2. 메모이제이션이 적용된 워크플로우
@@ -412,7 +403,7 @@ spec:
 
 ### 캐시 키 설계 전략
 
-`"model-v1"`처럼 너무 광범위한 키는 서로 다른 입력의 결과를 같은 키에 담아 캐시 오염을 유발합니다. 입력 파라미터 조합으로 고유 키를 생성해야 합니다. 날짜 기반 키로 일별 갱신도 구현할 수 있습니다.
+캐시 키가 너무 광범위하면 서로 다른 입력이 같은 키를 공유해 캐시가 오염됩니다. 입력 파라미터를 조합해 고유 키를 만들어야 합니다.
 
 ```yaml
 # 나쁜 예: 너무 광범위한 키 → 캐시 오염
@@ -431,18 +422,17 @@ memoize:
 
 ### 캐시 히트/미스 동작
 
+캐시 상태에 따른 동작은 다음과 같습니다.
+
 - **Cache Hit**: 이전에 저장된 output을 그대로 반환. 컨테이너 실행하지 않음.
 - **Cache Miss**: 템플릿 정상 실행 후 결과를 ConfigMap에 저장.
 - **maxAge 만료**: 만료된 항목은 무시되고 재실행 후 갱신.
 - **v3.5 이전**: output이 없는 템플릿에는 memoize 불가.
 - **v3.5+**: 모든 템플릿에 memoize 적용 가능.
 
-### ConfigMap 1MB 한도 대응
+### 제약사항 — ConfigMap 1MB 한도
 
-캐시가 누적되어 ConfigMap 1MB 한도를 초과하면 업데이트가 실패합니다. 캐시를 여러 ConfigMap으로 샤딩하거나, `maxAge`를 짧게 설정해 자동 만료·삭제를 유도하는 두 가지 해결책이 있습니다.
-
-> [!WARNING] 메모이제이션 캐시는 무한히 자라지 않는다
-> 메모이제이션 캐시는 ConfigMap 한 개에 쌓입니다. etcd의 오브젝트 크기 상한인 1MB를 넘기면 캐시 쓰기가 조용히 실패하기 시작합니다. 캐시 키 카디널리티가 높은 워크플로우라면 샤딩이나 짧은 `maxAge`로 상한에 닿지 않게 관리해야 합니다.
+ConfigMap 용량 제한은 1MB입니다. 캐시가 누적되어 이 한도를 넘으면 업데이트가 실패합니다. 두 가지 해결책이 있습니다. 캐시를 여러 ConfigMap으로 샤딩하거나, `maxAge`를 짧게 설정해 자동 만료를 유도합니다.
 
 ```yaml
 # ConfigMap 용량 제한: 1MB
@@ -458,7 +448,7 @@ memoize:
   maxAge: "1h"
 ```
 
-메모이제이션을 쓰는 워크플로우는 ConfigMap에 대한 `create`, `update` 권한이 추가로 필요합니다.
+메모이제이션을 쓰는 워크플로우는 ConfigMap에 대한 `get`, `create`, `update` 권한이 필요합니다. `create`와 `update`는 캐시를 새로 쓰고 갱신하는 데 필수입니다.
 
 ```yaml
 rules:
@@ -469,9 +459,11 @@ rules:
 
 ## 고급 패턴
 
+앞의 기능들 위에 재사용·백그라운드 서비스·스케줄링 제어 같은 패턴을 얹을 수 있습니다. 아래는 운영에서 자주 조합하는 설정 조각입니다.
+
 ### WorkflowTemplate 재사용 (Workflow of Workflows)
 
-공유 라이브러리 성격의 템플릿을 WorkflowTemplate으로 정의해 두고, 다른 워크플로우에서 `templateRef`로 참조합니다. 아래는 Slack 알림과 SQL 실행 템플릿을 공유 라이브러리로 정의한 예시입니다.
+공통 스텝을 [WorkflowTemplate](https://argo-workflows.readthedocs.io/en/latest/workflow-templates/)에 라이브러리로 정의해 두고, 여러 워크플로우에서 `templateRef`로 참조합니다. Slack 알림, SQL 실행 같은 반복 스텝을 한 곳에 모을 때 씁니다.
 
 ```yaml
 # 공유 라이브러리 정의
@@ -512,8 +504,6 @@ spec:
             key: password
 ```
 
-참조하는 워크플로우는 `templateRef`에 라이브러리 이름과 템플릿 이름을 지정하고 파라미터를 넘깁니다.
-
 ```yaml
 # 재사용하는 워크플로우
 apiVersion: argoproj.io/v1alpha1
@@ -547,7 +537,7 @@ spec:
 
 ### ClusterWorkflowTemplate — 멀티 네임스페이스 공유
 
-ClusterWorkflowTemplate은 네임스페이스 없이 클러스터 전체에서 접근 가능한 템플릿입니다.
+`ClusterWorkflowTemplate`은 클러스터 전역에서 접근 가능한 템플릿입니다. 네임스페이스가 없으며, 여러 네임스페이스가 공통으로 쓰는 표준 스텝(보안 스캔 등)을 정의할 때 씁니다. 참조할 때는 `clusterScope: true`가 필수입니다.
 
 ```yaml
 # 클러스터 전체에서 접근 가능한 템플릿
@@ -567,8 +557,6 @@ spec:
       args: ["image", "--exit-code", "1", "{{inputs.parameters.image}}"]
 ```
 
-다른 네임스페이스에서 참조할 때는 `clusterScope: true`가 필수입니다.
-
 ```yaml
 # 다른 네임스페이스에서 참조
 spec:
@@ -586,24 +574,9 @@ spec:
             value: "myapp:{{workflow.parameters.tag}}"
 ```
 
-### Daemon 컨테이너
+### Daemon 컨테이너 — 여러 스텝에 걸친 백그라운드 서비스
 
-Daemon 컨테이너는 Sidecar와 달리 여러 스텝에 걸쳐 지속되는 백그라운드 프로세스입니다. `daemon: true` 플래그로 백그라운드 실행을 지정하고, 다른 스텝에서는 `{{steps.NAME.ip}}`로 그 IP를 참조합니다. `readinessProbe`로 준비 완료를 확인한 뒤 다음 스텝이 진행됩니다. 템플릿 스코프가 끝나면 daemon은 자동으로 종료됩니다. 다음 다이어그램은 daemon이 세 스텝 동안 살아 있다가 스코프 종료와 함께 정리되는 생명주기를 나타냅니다.
-
-```mermaid
-sequenceDiagram
-    participant W as Workflow
-    participant D as Daemon (influxdb)
-    participant S as 후속 스텝
-    W->>D: start-db (daemon: true)
-    D-->>W: readinessProbe 통과
-    W->>S: run-benchmark
-    S->>D: steps.start-db.ip 로 접근
-    W->>S: collect-results
-    S->>D: 결과 조회
-    Note over W,D: 템플릿 스코프 종료
-    W-->>D: daemon 자동 종료
-```
+Daemon 컨테이너는 여러 스텝에 걸쳐 지속되는 백그라운드 프로세스입니다. 단일 스텝에만 붙는 Sidecar와 달리, 템플릿 스코프 전체 동안 살아 있어 뒤 스텝들이 그 서비스에 접근할 수 있습니다. 테스트용 DB나 모니터링 서버를 띄워 여러 스텝에서 쓸 때 적합합니다.
 
 ```yaml
 apiVersion: argoproj.io/v1alpha1
@@ -644,7 +617,7 @@ spec:
       args: ["curl http://{{steps.start-db.ip}}:8086/write?db=test -d 'metric,host=a value=1'"]
 ```
 
-Daemon과 Sidecar는 생명주기와 접근 범위가 다릅니다.
+`daemon: true` 플래그로 백그라운드 실행을 선언하고, `readinessProbe`로 준비 완료를 확인한 뒤 다음 스텝으로 넘어갑니다. daemon의 IP는 `{{steps.NAME.ip}}`로 참조합니다. Daemon과 Sidecar의 차이는 다음과 같습니다.
 
 | 특성 | Daemon | Sidecar |
 |---|---|---|
@@ -655,7 +628,7 @@ Daemon과 Sidecar는 생명주기와 접근 범위가 다릅니다.
 
 ### Init 컨테이너
 
-`initContainers`는 메인 컨테이너 전에 실행됩니다. `mirrorVolumeMounts: true`를 쓰면 메인 컨테이너의 볼륨 마운트를 그대로 복사합니다.
+Init 컨테이너는 메인 컨테이너보다 먼저 실행되어 준비 작업을 하는 컨테이너입니다. S3에서 설정 파일을 내려받는 것 같은 선행 작업에 씁니다. `mirrorVolumeMounts: true`를 두면 메인 컨테이너의 볼륨 마운트를 그대로 복사합니다.
 
 ```yaml
 templates:
@@ -680,7 +653,7 @@ templates:
 
 ### 노드 선택 및 스케줄링 제어
 
-`nodeSelector`·`tolerations`·`affinity`로 워크플로우가 실행될 노드를 제어합니다. 워크플로우 전체에 적용하거나, v3.6+부터는 템플릿 레벨에서 오버라이드할 수 있습니다.
+`nodeSelector`·`tolerations`·`affinity`로 스텝이 어느 노드에서 실행될지 제어합니다. GPU 워크로드를 GPU 노드에 배치할 때 씁니다. v3.6부터는 워크플로우 레벨뿐 아니라 템플릿 레벨에서도 `nodeSelector`/`tolerations`를 오버라이드할 수 있습니다.
 
 ```yaml
 apiVersion: argoproj.io/v1alpha1
@@ -731,7 +704,7 @@ spec:
 
 ### Pod GC 정책
 
-`podGC.strategy`는 완료된 Pod를 언제 삭제할지 결정합니다. 네 가지 전략이 있고, `deleteDelayDuration`(v3.5+)으로 삭제 전 유예 시간을 줄 수 있습니다.
+`podGC`는 완료된 Pod를 언제 삭제할지 정하는 정책입니다. 리소스를 빨리 반환할수록 실패 Pod의 로그가 사라지므로, 반환 속도와 로그 보존 사이에서 전략을 고릅니다.
 
 ```yaml
 apiVersion: argoproj.io/v1alpha1
@@ -753,17 +726,19 @@ spec:
   entrypoint: main
 ```
 
-전략은 용도에 따라 고릅니다.
+전략 선택 기준은 목적에 따라 갈립니다.
 
 - 디버깅 환경: `OnWorkflowSuccess` (실패 시 Pod 로그 보존)
 - 비용 절감: `OnPodCompletion` (즉시 리소스 반환)
 - 프로덕션 기본: `OnWorkflowCompletion` (감사 목적으로 워크플로우 완료까지 보존)
 
-## 스케줄링 & 트리거
+## 스케줄링과 트리거
+
+워크플로우를 주기적으로 실행하거나 외부 이벤트로 트리거하는 두 가지 방식이 있습니다. Cron 주기 실행은 CronWorkflow가, 이벤트 기반 트리거는 [Argo Events](https://argoproj.github.io/argo-events/)가 담당합니다.
 
 ### CronWorkflow 전체 필드
 
-CronWorkflow는 cron 스케줄로 워크플로우를 주기 실행합니다. v3.6+부터 `schedules` 리스트로 복수 스케줄을 지정하고, `stopStrategy.expression`과 `when`으로 자동 중단·조건부 실행을 설정할 수 있습니다.
+`CronWorkflow`는 Cron 주기마다 워크플로우를 실행하는 CRD입니다. v3.6부터 복수 스케줄, 자동 중단 조건, 조건부 실행이 추가됐습니다.
 
 ```yaml
 apiVersion: argoproj.io/v1alpha1
@@ -801,28 +776,26 @@ spec:
         args: ["Daily ETL at {{workflow.creationTimestamp}}"]
 ```
 
-`concurrencyPolicy`는 이전 실행이 끝나지 않았을 때 어떻게 처리할지 결정합니다.
+`concurrencyPolicy`는 이전 실행이 끝나지 않았을 때의 동작을 정합니다.
 
 - `Allow`: 이전 실행 완료 여부 무관하게 새 워크플로우 생성
 - `Forbid`: 실행 중인 워크플로우가 있으면 새 스케줄 건너뜀
 - `Replace`: 실행 중인 워크플로우를 종료하고 새 워크플로우 시작
 
-`startingDeadlineSeconds`는 컨트롤러가 재시작되거나 일시 중지 후 재개할 때, 이 기간 내 놓친 스케줄을 실행합니다. `0`으로 설정하면 항상 현재 시각 기준으로만 판단합니다.
+`startingDeadlineSeconds`는 컨트롤러가 재시작되거나 일시 중지 후 재개할 때, 이 기간 내 놓친 스케줄을 실행하게 합니다. `0`으로 설정하면 항상 현재 시각 기준으로만 판단합니다.
+
+> [!WARNING] DST 전환 주의
+> DST(일광절약시간) 전환 구간에서는 스케줄이 건너뛰거나 두 번 실행될 수 있습니다. 중요한 작업은 UTC 타임존 사용을 권장합니다.
 
 ### Argo Events 통합 패턴
 
-[Argo Events](https://argoproj.github.io/argo-events/)와 통합하면 외부 이벤트로 워크플로우를 트리거할 수 있습니다. 다음 그림은 외부 이벤트가 워크플로우 생성까지 흘러가는 경로입니다.
+Argo Events는 GitHub webhook 같은 외부 이벤트를 받아 워크플로우를 트리거합니다. `EventSource`가 이벤트를 수신하고, `Sensor`가 조건에 맞는 이벤트에서 워크플로우를 생성하는 구조입니다.
 
-```mermaid
-flowchart LR
-    ext[외부 이벤트<br/>GitHub push] --> es[EventSource<br/>이벤트 수신]
-    es --> eb[EventBus<br/>내부 전달]
-    eb --> sn[Sensor<br/>필터링·트리거]
-    sn -->|조건 충족| wf[Workflow 생성]
-    sn -.조건 불충족.-> drop[무시]
+```
+EventSource → Sensor → WorkflowEventBinding → Workflow
 ```
 
-EventSource는 이벤트를 수신합니다. 아래는 GitHub 푸시 웹훅을 받는 예시입니다.
+`EventSource`는 GitHub push 이벤트를 받는 webhook 엔드포인트를 정의합니다.
 
 ```yaml
 # EventSource: GitHub Webhook 수신
@@ -854,7 +827,7 @@ spec:
       contentType: json
 ```
 
-Sensor는 이벤트를 받아 필터링하고 워크플로우를 트리거합니다. 아래 예시는 main 브랜치 푸시만 트리거합니다.
+`Sensor`는 이벤트를 받아 필터를 적용하고 워크플로우를 트리거합니다. 아래 예시는 `main` 브랜치 푸시만 트리거합니다.
 
 ```yaml
 # Sensor: 이벤트 수신 → 워크플로우 트리거
@@ -900,11 +873,13 @@ spec:
           dest: spec.arguments.parameters.0.value
 ```
 
-## 보안 & RBAC
+## 보안과 RBAC
+
+보안 설정은 워크플로우가 최소 권한으로 실행되도록 하고, 누가 무엇을 할 수 있는지를 역할로 나누는 두 축입니다. 워크플로우 실행용 [ServiceAccount](https://kubernetes.io/docs/concepts/security/service-accounts/)를 최소 권한으로 분리하고, UI 조회·제출·관리를 역할별로 [RBAC](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)에 정의합니다.
 
 ### ServiceAccount 분리 전략
 
-워크플로우 실행용 ServiceAccount는 최소 권한 원칙에 따라 별도 생성합니다. `automountServiceAccountToken: false`로 불필요한 토큰 마운트를 방지합니다. 메모이제이션을 쓰면 ConfigMap의 `create`, `update` 권한을 Role에 추가합니다.
+워크플로우 실행용 SA는 최소 권한 원칙에 따라 별도 생성합니다. `automountServiceAccountToken: false`로 불필요한 토큰 마운트를 막습니다. 메모이제이션을 쓰는 워크플로우는 ConfigMap `create`·`update` 권한이 추가로 필요합니다.
 
 ```yaml
 # 1. 워크플로우 실행용 SA (최소 권한)
@@ -943,7 +918,11 @@ spec:
 
 ### 역할 분리 패턴
 
-권한은 역할에 따라 단계적으로 부여합니다. UI 읽기 전용은 `get, list, watch`만, 워크플로우 제출은 거기에 `create`를 더합니다.
+권한은 세 역할로 나눕니다. UI 읽기 전용은 조회만, 제출자는 `create`를 더하고, 관리자는 `delete`·`patch`까지 갖습니다.
+
+- UI 읽기 전용: `workflows`, `workflowtemplates`, `cronworkflows`에 `get, list, watch`만 부여
+- 워크플로우 제출: 위 권한에 `create` 추가
+- 관리자: `delete`, `patch` 포함 전체 권한
 
 ```yaml
 # UI 읽기 전용 사용자
@@ -978,7 +957,7 @@ rules:
 
 ### Pod Security Context
 
-워크플로우 레벨 `securityContext`는 모든 Pod에 적용되고, 템플릿 레벨에서 오버라이드할 수 있습니다. v3.6+에서는 `seccompProfile.type: RuntimeDefault` 기본 활성화가 권장됩니다. 컨테이너 레벨에서 `allowPrivilegeEscalation: false`, `readOnlyRootFilesystem: true`, `capabilities.drop: [ALL]`을 추가하는 것이 보안 강화의 표준 패턴입니다.
+Pod Security Context는 컨테이너를 non-root로, 권한 상승 없이 실행하도록 강제하는 설정입니다. 워크플로우 레벨에서 모든 Pod에 적용하고, 개별 템플릿에서 오버라이드합니다. `seccompProfile: RuntimeDefault`는 v3.6부터 기본 활성화가 권장됩니다.
 
 ```yaml
 apiVersion: argoproj.io/v1alpha1
@@ -1004,9 +983,11 @@ spec:
       args: ["secure execution"]
 ```
 
+컨테이너 레벨에서 `allowPrivilegeEscalation: false`, `readOnlyRootFilesystem: true`, `capabilities.drop: [ALL]`을 더하는 것이 보안 강화의 표준 패턴입니다.
+
 ### SSO with Dex (OIDC)
 
-Argo Server는 [Dex](https://dexidp.io/)를 통해 [OIDC](https://openid.net/developers/how-connect-works/) 기반 SSO를 지원합니다. 컨트롤러 ConfigMap의 `sso` 블록에 OIDC 발급자·클라이언트·스코프를 설정합니다. `filterGroupsRegex`로 불필요한 그룹을 필터링해 RBAC 평가 부하를 줄이고, `customGroupClaimName`으로 비표준 groups 클레임을 매핑합니다.
+[Dex](https://dexidp.io/)를 통한 SSO는 OIDC 그룹 기반으로 RBAC을 정의합니다. ServiceAccount의 `workflows.argoproj.io/rbac-rule` 어노테이션에 CEL 표현식으로 그룹 규칙을 걸고, `rbac-rule-precedence` 숫자가 높을수록 우선순위가 높습니다. `filterGroupsRegex`로 불필요한 그룹을 걸러 RBAC 평가 부하를 줄입니다.
 
 ```yaml
 # workflow-controller-configmap
@@ -1038,8 +1019,6 @@ data:
     customGroupClaimName: argo_groups   # 비표준 groups 클레임 매핑
 ```
 
-ServiceAccount의 어노테이션 `workflows.argoproj.io/rbac-rule`에 [CEL](https://cel.dev/) 표현식으로 그룹 기반 RBAC을 정의합니다. `rbac-rule-precedence` 숫자가 높을수록 우선순위가 높습니다.
-
 ```yaml
 # ServiceAccount에 RBAC 규칙 어노테이션
 apiVersion: v1
@@ -1062,7 +1041,7 @@ metadata:
     workflows.argoproj.io/rbac-rule-precedence: "1"
 ```
 
-SSO를 시작할 때는 `--auth-mode`를 복수로 지정합니다.
+SSO는 복수 auth-mode를 동시에 지정해 시작합니다.
 
 ```bash
 argo server \
@@ -1072,7 +1051,7 @@ argo server \
 
 ### Argo Server API 인증
 
-Argo Server API는 Bearer Token으로 인증합니다. `argo auth token`으로 토큰을 발급하거나 ServiceAccount 토큰을 직접 사용합니다.
+Argo Server API는 Bearer Token으로 인증합니다. 토큰은 `argo auth token`으로 발급하거나 ServiceAccount Token을 직접 씁니다.
 
 ```bash
 # Bearer Token 방식
@@ -1089,11 +1068,13 @@ curl -H "Authorization: Bearer ${SA_TOKEN}" \
 argo auth token --namespace argo
 ```
 
-## 성능 & 스케일링
+## 성능과 스케일링
 
-### 컨트롤러 QPS/Burst 설정
+대규모 환경에서는 컨트롤러가 처리량 병목이 됩니다. 컨트롤러의 API 요청 속도(QPS/Burst), 병렬 처리 워커 수, Pod 생성 속도, TTL과 GC 주기를 함께 조율해야 [etcd](https://etcd.io/) 부하를 막고 처리량을 확보할 수 있습니다.
 
-컨트롤러 Deployment의 args로 Kubernetes API 호출 속도와 워커 수를 조정합니다. 괄호 안이 기본값입니다.
+### Controller QPS/Burst 설정
+
+컨트롤러의 처리량은 Deployment args로 튜닝합니다. Kubernetes API 요청 속도(`--qps`/`--burst`)와 워크플로우·Pod 처리 병렬도(`--workflow-workers` 등)가 핵심 파라미터입니다.
 
 ```yaml
 # Argo Workflows 컨트롤러 Deployment args
@@ -1123,18 +1104,18 @@ spec:
             memory: 8Gi
 ```
 
-CNOE의 2024년 Amazon EKS 확장성 테스트 결과는 다음과 같습니다. QPS/Burst=50/75, workers=32에서 분당 540 워크플로우가 포화점이었고, workers=32 상태에서 QPS를 더 높여도 처리량이 늘지 않았습니다.
+CNOE 2024 EKS 확장성 테스트 결과는 다음과 같습니다. QPS/Burst 40/50·workers=32에서 분당 540 워크플로우에 도달했고, QPS를 더 높여도(50/60) 처리량이 늘지 않는 포화점이었습니다.
 
 | QPS/Burst | Workers | 최대 워크플로우/분 |
 |---|---|---|
 | 20/30 | 8 | 270 |
 | 30/40 | 16 | 420 (+55%) |
 | 40/50 | 32 | 540 (+28%) |
-| 50/75 | 32 | 540 (포화점) |
+| 50/60 | 32 | 540 (포화점) |
 
 ### Pod 생성 속도 제한
 
-`resourceRateLimit`은 Pod 생성 속도를 제한합니다. 이 설정은 Pod에만 적용되고, ConfigMap·PVC 등 다른 리소스는 `--qps`/`--burst`로 별도 제어합니다.
+`resourceRateLimit`은 초당 Pod 생성 요청 수를 제한합니다. 이 설정은 Pod에만 적용되며, ConfigMap·PVC 등 다른 리소스는 `--qps`/`--burst`로 제어합니다.
 
 ```yaml
 # workflow-controller-configmap
@@ -1146,7 +1127,7 @@ data:
 
 ### Workflow TTL 설정
 
-`ttlStrategy`로 완료된 워크플로우를 자동 삭제합니다. 완료·성공·실패별로 보존 시간을 다르게 둘 수 있고, 디버깅을 위해 실패 워크플로우는 오래 보존하는 식으로 씁니다.
+`ttlStrategy`는 완료된 Workflow 객체를 얼마나 남길지 정합니다. 성공·실패·완료별로 보존 기간을 다르게 줄 수 있습니다. 실패한 워크플로우는 디버깅을 위해 더 길게 남기는 것이 일반적입니다.
 
 ```yaml
 spec:
@@ -1156,7 +1137,7 @@ spec:
     secondsAfterFailure: 604800      # 실패 후 7일 (디버깅 목적)
 ```
 
-전역 기본값은 컨트롤러 ConfigMap의 `workflowDefaults`에 둡니다.
+전역 기본값은 `workflow-controller-configmap`의 `workflowDefaults`에 둡니다.
 
 ```yaml
 data:
@@ -1168,9 +1149,9 @@ data:
         strategy: OnWorkflowCompletion
 ```
 
-### 대규모 withParam 주의점
+### 대규모 withParam 최적화
 
-`withParam`으로 수천 개 아이템을 처리하면 etcd 메모리가 급증합니다. 배치 처리로 분할하거나 `parallelism`으로 동시 실행 수를 제한합니다.
+`withParam`으로 수천 개 아이템을 처리하면 etcd 메모리가 급증합니다. 아이템 수가 만 개를 넘으면 문제가 되므로, 배치로 나누거나 `parallelism`으로 동시 실행 수를 제한합니다.
 
 ```yaml
 # 위험: withParam으로 수천 개 아이템 처리 시 etcd 메모리 급증
@@ -1196,7 +1177,7 @@ data:
   parallelism: 50   # 한 번에 50개만 실행
 ```
 
-v3.6+ 환경에서는 256KB를 초과하는 파라미터가 자동으로 오브젝트 스토리지에 오프로딩됩니다.
+v3.6 환경에서는 파라미터가 256KB를 초과하면 자동으로 오브젝트 스토리지에 오프로딩됩니다.
 
 ```yaml
 # 자동 오프로딩: 파라미터가 256KB 초과 시 자동으로 오브젝트 스토리지에 저장
@@ -1209,10 +1190,10 @@ data:
     offloadNodeStatusVersion: "v1"
 ```
 
-재귀 깊이는 기본 최대 100입니다. `DISABLE_MAX_RECURSION`으로 비활성화할 수 있지만 무한 루프 위험이 있습니다.
+<details markdown="1">
+<summary>심화: 재귀 깊이 제한과 세마포어 캐시, 샤딩</summary>
 
-> [!DANGER] 재귀 깊이 가드를 끄지 말 것
-> `DISABLE_MAX_RECURSION=true`는 재귀 템플릿의 안전장치를 제거합니다. 종료 조건에 버그가 있으면 컨트롤러가 Pod를 무한히 생성해 클러스터 리소스를 고갈시킬 수 있습니다. 기본값 100을 유지하고, 정말 깊은 재귀가 필요하면 종료 조건을 먼저 검증하세요.
+**재귀 깊이 제한.** 기본 최대 재귀 깊이는 100입니다. `DISABLE_MAX_RECURSION` 환경 변수로 끌 수 있지만, 무한 루프 위험이 있습니다.
 
 ```yaml
 # 기본 최대 재귀 깊이: 100
@@ -1224,9 +1205,7 @@ containers:
     value: "true"
 ```
 
-### 세마포어 ConfigMap 캐시
-
-`semaphoreLimitCacheSeconds`로 세마포어 ConfigMap 조회 캐시 TTL을 설정합니다.
+**세마포어 ConfigMap 캐시.** `semaphoreLimitCacheSeconds`는 세마포어 한도를 담은 ConfigMap의 조회 캐시 TTL을 초 단위로 정합니다(기본 60초).
 
 ```yaml
 # workflow-controller-configmap
@@ -1235,9 +1214,7 @@ data:
     semaphoreLimitCacheSeconds: 60   # ConfigMap 조회 캐시 TTL (초)
 ```
 
-### 샤딩 (대규모 멀티테넌트 환경)
-
-네임스페이스별로 컨트롤러를 분리하거나 `instanceID`로 논리적으로 격리합니다.
+**샤딩(대규모 멀티테넌트 환경).** 컨트롤러를 네임스페이스별로 분리하거나 `instanceID`로 논리적으로 격리합니다.
 
 ```yaml
 # 네임스페이스별 컨트롤러 분리
@@ -1253,9 +1230,13 @@ data:
   instanceID: "cluster-a"   # 같은 클러스터 내 다른 컨트롤러와 격리
 ```
 
-## v3.5~v3.6 주요 변경사항
+</details>
 
-### v3.5 주요 기능 (2023-08)
+## v3.5 / v3.6 주요 변경사항
+
+버전별로 동시성·스케줄링·보안·성능 영역에서 기능이 추가됐습니다. 아래는 v3.5와 v3.6의 주요 변경과 deprecated 항목입니다.
+
+### v3.5 (2023-08)
 
 | 기능 | 설명 |
 |---|---|
@@ -1268,7 +1249,7 @@ data:
 | `--cron-workflow-workers` | CronWorkflow 전용 워커 수 설정 추가 |
 | `filterGroupsRegex` | SSO 그룹 필터링 정규식 지원 |
 
-### v3.6 주요 기능 (2024)
+### v3.6 (2024)
 
 | 기능 | 설명 |
 |---|---|
@@ -1282,10 +1263,10 @@ data:
 | Seccomp 기본값 | `RuntimeDefault` seccomp 프로파일 자동 적용 |
 | 병렬 Pod 정리 | 재시도 완료 처리 속도 대폭 향상 |
 | Pod Kubernetes finalizer | Pod 조기 삭제 오류 방지 |
-| 메트릭 개편 | [Prometheus](https://prometheus.io/) 메트릭 구조 전면 재설계 |
+| 메트릭 개편 | Prometheus 메트릭 구조 전면 재설계 |
 | 큐 기반 아카이빙 | 대규모 아카이빙 시 메모리 효율성 개선 |
 
-### deprecated 기능
+### deprecated 항목
 
 | 기능 | 대안 | 비고 |
 |---|---|---|
@@ -1297,9 +1278,9 @@ data:
 | `withSequence.count` string → int | `withSequence.count`를 정수로 | 타입 변경 |
 | Argo Server Deployment의 `--port` | `--http-port`, `--https-port` | 분리됨 |
 
-## 운영 환경 설정 종합
+## 운영 환경 설정과 트러블슈팅
 
-아래는 컨트롤러 ConfigMap에 동시성·리소스 속도 제한·세마포어 캐시·기본 워크플로우 설정·Executor 리소스를 한데 모은 예시입니다.
+앞의 설정들을 프로덕션 기준으로 모으면 컨트롤러 ConfigMap 하나로 정리됩니다. 동시성, 리소스 속도 제한, 기본 워크플로우 설정, Executor 리소스를 한곳에 둡니다.
 
 ```yaml
 # workflow-controller-configmap 종합 예시
@@ -1346,7 +1327,7 @@ data:
         memory: 512Mi
 ```
 
-운영 중 자주 쓰는 트러블슈팅 명령은 다음과 같습니다.
+프로덕션에서는 `podGC.strategy: OnWorkflowSuccess`를 기본으로 두는 것이 권장됩니다. 실패한 워크플로우의 Pod 로그가 보존되어 디버깅이 가능하기 때문입니다. 자주 쓰는 트러블슈팅 명령은 다음과 같습니다.
 
 ```bash
 # 잠금 대기 중인 워크플로우 확인
@@ -1365,8 +1346,10 @@ curl localhost:9090/metrics | grep argo_workflows
 
 ## 참고 자료
 
-- Argo Workflows, [공식 문서](https://argo-workflows.readthedocs.io/en/latest/)
-- Alibaba Cloud, [Argo Workflows 3.6 — Key New Features in Cloud-Native Orchestration](https://www.alibabacloud.com/blog/argo-workflows-3-6-key-new-features-in-cloud-native-orchestration_601872)
+- Argo Workflows, [공식 문서](https://argo-workflows.readthedocs.io/en/latest/) — Retries·Synchronization·Memoization·Scaling·Security·CronWorkflows 등 세부 페이지 포함
+- Argo Project, [Argo Events](https://argoproj.github.io/argo-events/)
+- Alibaba Cloud, [Argo Workflows 3.6: Key New Features in Cloud-Native Orchestration](https://www.alibabacloud.com/blog/argo-workflows-3-6-key-new-features-in-cloud-native-orchestration_601872)
 - CNOE, [Argo Workflow Scalability (Amazon EKS)](https://cnoe.io/blog/argo-workflow-scalability)
 - Pipekit, [Argo Workflows 3.6](https://pipekit.io/blog/argo-workflows-3-6)
+
 {% endraw %}
