@@ -1,8 +1,8 @@
 ---
-title: "컨테이너 이미지 포맷과 Registry Pull 프로토콜 (OCI Image Spec)"
+title: "컨테이너 이미지 포맷과 Pull 프로토콜"
 date: 2026-07-04 20:14:40 +0900
 categories: [Infra, Kubernetes]
-tags: [container, oci, docker, image, registry, kubernetes, imagepullpolicy, TIL]
+tags: [컨테이너, OCI, Docker, 이미지, 레지스트리, Kubernetes, imagepullpolicy, TIL]
 source_wiki: container-image-pull-format
 provenance: cite-only
 ---

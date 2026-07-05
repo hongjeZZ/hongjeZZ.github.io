@@ -1,5 +1,5 @@
 ---
-title: "nvidia-smi 정리: 기본 출력·쿼리·모니터링부터 관리 명령·MIG·토폴로지까지"
+title: "nvidia-smi 정리"
 date: 2026-06-30 16:16:14 +0900
 categories: [Infra, GPU]
 tags: [nvidia-smi, GPU, NVIDIA, 모니터링, NVML, MIG, DCGM]

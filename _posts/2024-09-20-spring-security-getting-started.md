@@ -2,7 +2,7 @@
 title: Spring Security 시작하기
 date: 2024-09-20 21:54:30 +0900
 categories: [Back-End, Spring]
-tags: [Spring, spring security]
+tags: [Spring, Spring Security]
 ---
 
 ## 1. 인증(Authentication)과 인가(Authorization)의 개념

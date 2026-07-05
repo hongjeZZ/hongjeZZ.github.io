@@ -2,7 +2,7 @@
 title: "Argo Workflows 핵심 아키텍처 정리 - 1"
 date: 2026-06-21 14:04:24 +0900
 categories: [Infra, Kubernetes]
-tags: [TIL, Argo Workflows, Kubernetes, CRD, 워크플로우]
+tags: [TIL, Argo Workflows, Kubernetes, CRD]
 source_wiki: argo-workflows-core
 provenance: cite-only
 ---

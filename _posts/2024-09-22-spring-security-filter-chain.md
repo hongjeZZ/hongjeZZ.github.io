@@ -2,7 +2,7 @@
 title: Spring Security Filter Chain 자세히 알아보기
 date: 2024-09-22 13:26:38 +0900
 categories: [Back-End, Spring]
-tags: [Spring, spring security]
+tags: [Spring, Spring Security]
 ---
 
 ## 1. Spring Security Filter Chain 이란?

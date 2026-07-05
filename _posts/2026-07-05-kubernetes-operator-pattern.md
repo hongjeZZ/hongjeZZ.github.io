@@ -1,8 +1,8 @@
 ---
-title: "Kubernetes Operator 패턴: CRD·재조정 루프·성숙도 모델"
+title: "Kubernetes Operator 패턴 정리"
 date: 2026-07-05 13:18:45 +0900
 categories: [Infra, Kubernetes]
-tags: [kubernetes, operator-pattern, crd, custom-controller, reconciliation-loop, client-go, argo-cd, argo-workflows, helm, kubebuilder, operator-sdk, TIL]
+tags: [Kubernetes, Operator 패턴, CRD, 커스텀 컨트롤러, 재조정 루프, client-go, Argo CD, Argo Workflows, Helm, Kubebuilder, Operator SDK, TIL]
 source_wiki: kubernetes-operator-pattern
 provenance: cite-only
 ---

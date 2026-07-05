@@ -2,7 +2,7 @@
 title: "노드의 컨테이너 이미지 저장·계층 공유·GC"
 date: 2026-07-04 20:46:33 +0900
 categories: [Infra, Kubernetes]
-tags: [container, overlayfs, containerd, image-cache, garbage-collection, kubelet, TIL]
+tags: [컨테이너, overlayfs, containerd, image-cache, garbage-collection, kubelet, TIL]
 source_wiki: node-image-storage-reuse
 provenance: cite-only
 ---
