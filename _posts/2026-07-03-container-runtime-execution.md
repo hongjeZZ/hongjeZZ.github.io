@@ -1,7 +1,7 @@
 ---
 title: "컨테이너 런타임 실행 경로: CRI·containerd·CRI-O·runc"
 date: 2026-07-03 19:51:03 +0900
-categories: [Kubernetes, Container]
+categories: [Infra, Kubernetes]
 tags: [container, cri, containerd, cri-o, runc, kubernetes, kubelet, pod-sandbox]
 source_wiki: container-runtime-execution
 provenance: cite-only
