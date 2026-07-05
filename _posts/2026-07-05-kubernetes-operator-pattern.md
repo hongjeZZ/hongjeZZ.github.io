@@ -7,6 +7,8 @@ source_wiki: kubernetes-operator-pattern
 provenance: cite-only
 ---
 
+![Kubernetes](/assets/img/kubernetes-operator-pattern/cover.png)
+
 {% raw %}
 
 [Operator](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/)는 [CustomResourceDefinition](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/)(CRD)으로 새 API 종류를 등록하고, 그 CRD를 대상으로 "원하는 상태(spec)"와 "관측된 상태(status)"를 끊임없이 비교·수렴시키는 컨트롤러를 붙입니다. 이렇게 사람 운영자가 갖고 있던 애플리케이션별 운영 지식(배포·백업·업그레이드·장애 대응)을 코드로 인코딩하는 패턴입니다.
