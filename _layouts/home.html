@@ -31,7 +31,8 @@ layout: default
       {%- endif -%}
     </span>
     {%- if thumb != '' -%}
-    <img class="entry-thumb" src="{{ thumb }}" alt="" loading="lazy" width="208" height="128">
+    {%- assign _logo = '' -%}{%- if thumb contains 'cover.png' -%}{%- assign _logo = ' entry-thumb--logo' -%}{%- endif -%}
+    <img class="entry-thumb{{ _logo }}" src="{{ thumb }}" alt="" loading="lazy" width="208" height="128">
     {%- else -%}
     <img class="entry-thumb entry-thumb--default" src="{{ '/favicon.svg' | relative_url }}" alt="" loading="lazy" width="208" height="128">
     {%- endif -%}
