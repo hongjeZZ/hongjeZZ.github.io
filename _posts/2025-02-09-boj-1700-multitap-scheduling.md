@@ -5,6 +5,8 @@ categories: [PS, 백준]
 tags: [구현, 그리디]
 ---
 
+![Java](/assets/img/boj-1700-multitap-scheduling/cover.png)
+
 **난이도** : 골드 1
 
 **유형** : 그리디 / 구현

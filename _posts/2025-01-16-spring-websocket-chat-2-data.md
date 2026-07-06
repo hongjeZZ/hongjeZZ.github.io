@@ -5,6 +5,8 @@ categories: [Back-End, Spring]
 tags: [Spring, STOMP, 웹소켓]
 ---
 
+![Spring](/assets/img/spring-websocket-chat-2-data/cover.png)
+
 ## 들어가며
 
 야구 직관 서비스 캐치미 프로젝트에서 실시간 채팅 서비스를 구현한 내용을 기록 및 복습의 목적으로 본 글을 포스팅합니다. 이번 포스팅에서는 캐치미 채팅 서비스의 **도메인 규칙**에 따라 **채팅 데이터베이스를 설계**한 경험을 다뤄보려고 합니다. **소켓과 웹소켓, STOMP 프로토콜에 대한 개념, HTTP 통신과의 차이점**의 차이점을 알고 싶은 분은 [이전 글](/posts/spring-websocket-chat-1-websocket/)을 참고해 주세요!

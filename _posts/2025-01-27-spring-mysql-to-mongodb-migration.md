@@ -5,6 +5,8 @@ categories: [Back-End, Spring]
 tags: [MongoDB, Spring]
 ---
 
+![MongoDB](/assets/img/spring-mysql-to-mongodb-migration/cover.png)
+
 ## 들어가며
 
 이번 포스팅에서는 MySQL로 구현된 채팅 데이터베이스를 MongoDB로 마이그레이션 하고, **bwildvogel** 라이브러리를 사용하여 스프링 내장 MongoDB를 띄워 테스트 코드를 구현하는 과정을 다뤄보겠습니다.

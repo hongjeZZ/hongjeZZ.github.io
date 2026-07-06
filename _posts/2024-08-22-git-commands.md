@@ -5,6 +5,8 @@ categories: [기타]
 tags: [TIL, CLI, Git]
 ---
 
+![Git](/assets/img/git-commands/cover.png)
+
 ### 깃 초기 설정
 
 ```shell

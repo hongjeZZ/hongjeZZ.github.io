@@ -5,6 +5,8 @@ categories: [PS, 프로그래머스]
 tags: [BFS, 큐]
 ---
 
+![Java](/assets/img/programmers-maze-escape/cover.png)
+
 **난이도** : Level 2
 
 **유형** : BFS / 큐

@@ -5,6 +5,8 @@ categories: [Back-End, Spring]
 tags: [MongoDB, Spring Boot, ZonedDateTime]
 ---
 
+![MongoDB](/assets/img/spring-mongodb-localdatetime-utc/cover.png)
+
 ## 문제 상황
 
 ![](/assets/img/spring-mongodb-localdatetime-utc/01.png)

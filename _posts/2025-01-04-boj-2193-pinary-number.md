@@ -5,6 +5,8 @@ categories: [PS, 백준]
 tags: [DP]
 ---
 
+![Java](/assets/img/boj-2193-pinary-number/cover.png)
+
 **난이도** : 실버 3
 
 **유형 :** DP(동적 계획법)

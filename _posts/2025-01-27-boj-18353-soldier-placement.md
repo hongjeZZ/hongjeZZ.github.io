@@ -5,6 +5,8 @@ categories: [PS, 백준]
 tags: [DP, LIS]
 ---
 
+![Java](/assets/img/boj-18353-soldier-placement/cover.png)
+
 **난이도** : 실버 2
 
 **유형 :** 동적 계획법 / LIS

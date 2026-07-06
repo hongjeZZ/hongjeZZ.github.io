@@ -5,6 +5,8 @@ categories: [PS, 프로그래머스]
 tags: [구현, 시뮬레이션]
 ---
 
+![Java](/assets/img/programmers-lock-and-key/cover.png)
+
 **난이도** : Level 3
 
 **유형** : 구현 / 시뮬레이션

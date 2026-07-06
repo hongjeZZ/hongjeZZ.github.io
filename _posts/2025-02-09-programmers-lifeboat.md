@@ -5,6 +5,8 @@ categories: [PS, 프로그래머스]
 tags: [그리디, 이진탐색, 투 포인터]
 ---
 
+![Java](/assets/img/programmers-lifeboat/cover.png)
+
 **난이도** : Level 2
 
 **유형**: 그리디 / 투 포인터

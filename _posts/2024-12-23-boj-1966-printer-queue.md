@@ -5,6 +5,8 @@ categories: [PS, 백준]
 tags: [구현, 시뮬레이션]
 ---
 
+![Java](/assets/img/boj-1966-printer-queue/cover.png)
+
 **난이도** : 실버 3
 
 **유형** : 구현 / 시뮬레이션

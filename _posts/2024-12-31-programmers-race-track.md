@@ -5,6 +5,8 @@ categories: [PS, 프로그래머스]
 tags: [BFS, 카카오, 큐]
 ---
 
+![Java](/assets/img/programmers-race-track/cover.png)
+
 **난이도** : Level 3
 
 **유형** : BFS / 큐

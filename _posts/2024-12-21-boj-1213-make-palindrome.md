@@ -5,6 +5,8 @@ categories: [PS, 백준]
 tags: [구현, 그리디, 문자열]
 ---
 
+![Java](/assets/img/boj-1213-make-palindrome/cover.png)
+
 **난이도** : 실버 4
 
 **유형** : 문자열 / 그리디 / 구현

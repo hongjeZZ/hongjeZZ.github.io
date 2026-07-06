@@ -5,6 +5,8 @@ categories: [PS, 백준]
 tags: [구현, 그리디, 우선순위 큐]
 ---
 
+![Java](/assets/img/boj-1417-assembly-election/cover.png)
+
 **난이도** : 실버 5
 
 **유형** : 그리디 / 구현 / 우선순위 큐

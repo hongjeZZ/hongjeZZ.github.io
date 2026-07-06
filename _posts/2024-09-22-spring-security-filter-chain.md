@@ -5,6 +5,8 @@ categories: [Back-End, Spring]
 tags: [Spring, Spring Security]
 ---
 
+![Spring](/assets/img/spring-security-filter-chain/cover.png)
+
 ## 1. Spring Security Filter Chain 이란?
 
 ![](/assets/img/spring-security-filter-chain/01.png)

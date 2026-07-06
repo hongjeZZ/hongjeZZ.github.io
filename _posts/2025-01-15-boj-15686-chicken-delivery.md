@@ -5,6 +5,8 @@ categories: [PS, 백준]
 tags: [구현, 백트래킹, 조합]
 ---
 
+![Java](/assets/img/boj-15686-chicken-delivery/cover.png)
+
 **난이도** : 골드 5
 
 **유형** : 조합 / 구현 / 백트래킹

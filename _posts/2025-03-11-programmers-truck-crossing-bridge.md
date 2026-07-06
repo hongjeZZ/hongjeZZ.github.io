@@ -5,6 +5,8 @@ categories: [PS, 프로그래머스]
 tags: [구현, 시뮬레이션, 큐]
 ---
 
+![Java](/assets/img/programmers-truck-crossing-bridge/cover.png)
+
 **난이도** : Level 2
 
 **유형**: 큐 / 구현 / 시뮬레이션

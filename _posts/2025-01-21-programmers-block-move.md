@@ -5,6 +5,8 @@ categories: [PS, 프로그래머스]
 tags: [BFS, 구현]
 ---
 
+![Java](/assets/img/programmers-block-move/cover.png)
+
 **난이도** : Level 3
 
 **유형**: BFS / 구현

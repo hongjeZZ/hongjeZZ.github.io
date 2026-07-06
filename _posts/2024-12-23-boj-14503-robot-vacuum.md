@@ -5,6 +5,8 @@ categories: [PS, 백준]
 tags: [구현, 시뮬레이션]
 ---
 
+![Java](/assets/img/boj-14503-robot-vacuum/cover.png)
+
 **난이도** : 골드 5
 
 **유형** : 구현 / 시뮬레이션

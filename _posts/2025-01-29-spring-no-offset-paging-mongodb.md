@@ -5,6 +5,8 @@ categories: [Back-End, Spring]
 tags: [MongoDB, Spring]
 ---
 
+![MongoDB](/assets/img/spring-no-offset-paging-mongodb/cover.png)
+
 ## 들어가며
 
 CATCH-Mi 서비스의 성능 개선을 진행하면서, **No Offset Pagination**을 통해 페이징 기능을 효과적으로 개선할 수 있다는 것을 알게 되었습니다. 이번 글에는 *기존 Offset 방식과 No Offset 방식의 장단점을 비교*하고, 실제 서비스에 *No Offset 방식을 어떻게 적용했는지* 코드와 함께 그 과정을 정리해보고자 합니다.

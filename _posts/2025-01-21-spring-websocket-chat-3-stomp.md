@@ -5,6 +5,8 @@ categories: [Back-End, Spring]
 tags: [STOMP, 웹소켓]
 ---
 
+![Spring](/assets/img/spring-websocket-chat-3-stomp/cover.png)
+
 ## 들어가며
 
 야구 직관 서비스 캐치미 프로젝트에서 실시간 채팅 서비스를 구현한 내용을 기록 및 복습의 목적으로 본 글을 포스팅합니다. 이번 포스팅에서는 STOMP 프로토콜과 스프링 내장 메시지 브로커를 사용해서 실제 채팅 애플리케이션을 구현하는 과정을 다뤄보려고 합니다. 캐치미 서비스의 **채팅 도메인 규칙**과 **채팅 ERD 설계 과정**이 궁금하신 분은 [이전 글](/posts/spring-websocket-chat-2-data/)을 참고해주세요!

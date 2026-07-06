@@ -5,6 +5,8 @@ categories: [PS, 프로그래머스]
 tags: [BFS, MST, 우선순위 큐]
 ---
 
+![Java](/assets/img/programmers-terrain-movement/cover.png)
+
 **난이도** : Level 4
 
 **유형** : BFS / 우선순위 큐

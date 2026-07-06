@@ -5,6 +5,8 @@ categories: [Back-End, Spring]
 tags: [MongoDB, Spring Boot, 트랜잭션]
 ---
 
+![MongoDB](/assets/img/spring-mongodb-mysql-heterogeneous-transaction/cover.png)
+
 ## 문제 상황
 
 채팅 데이터베이스를 MySQL에서 MongoDB로 이전하며 트랜잭션이 적용되지 않는 문제가 발생했습니다.

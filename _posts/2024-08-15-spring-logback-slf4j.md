@@ -5,6 +5,8 @@ categories: [Back-End, Spring]
 tags: [Spring, logback]
 ---
 
+![Spring](/assets/img/spring-logback-slf4j/cover.png)
+
 ## 1. Logging
 
 ### Logging이란?

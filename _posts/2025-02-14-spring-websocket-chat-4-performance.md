@@ -5,6 +5,8 @@ categories: [Back-End, Spring]
 tags: [JMeter, Redis, Spring]
 ---
 
+![Spring](/assets/img/spring-websocket-chat-4-performance/cover.png)
+
 ## **들어가며**
 
 야구 직관 서비스 CATCH-Mi 프로젝트에서 실시간 채팅 서비스를 구현한 경험을 기록하고 복습하기 위해 본 글을 작성합니다. 이번 포스팅에서는 현재 CATCH-Mi 채팅 서비스의 **문제점과 잠재적인 장애 요소를 고민**하고, 이에 대한 **성능 개선 과정과 *Jmeter*를 통한 성능 테스트** 결과를 비교해 보겠습니다.

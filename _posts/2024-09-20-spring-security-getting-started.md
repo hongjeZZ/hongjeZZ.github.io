@@ -5,6 +5,8 @@ categories: [Back-End, Spring]
 tags: [Spring, Spring Security]
 ---
 
+![Spring](/assets/img/spring-security-getting-started/cover.png)
+
 ## 1. 인증(Authentication)과 인가(Authorization)의 개념
 
 웹 애플리케이션을 개발하다 보면 '인증'과 '인가'라는 용어를 자주 접하게 된다. 이 두 가지 개념은 보안 시스템에서 매우 중요한 부분으로, 쉽게 설명하자면 인증은 '누가 누구인지 확인하는 것', 인가는 '무엇을 할 수 있는지 확인하는 것'이다. 지금부터 이 두 가지 개념을 간단하게 알아보자.

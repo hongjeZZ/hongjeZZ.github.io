@@ -5,6 +5,8 @@ categories: [Back-End, Spring]
 tags: [Spring]
 ---
 
+![Spring](/assets/img/spring-application-properties-profile/cover.png)
+
 ## 1. `application.properties` 파일 설정
 
 ### application.properties
