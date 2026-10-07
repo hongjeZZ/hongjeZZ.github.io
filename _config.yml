@@ -42,5 +42,3 @@ exclude:
   - LICENSE
   - README.md
   - vendor
-  - .devcontainer
-  - .vscode

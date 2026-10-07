@@ -1,39 +1,19 @@
-# Chirpy Starter
+# hongjeZZ.github.io
 
-[![Gem Version](https://img.shields.io/gem/v/jekyll-theme-chirpy)][gem]&nbsp;
-[![GitHub license](https://img.shields.io/github/license/cotes2020/chirpy-starter.svg?color=blue)][mit]
+백엔드·인프라·Kubernetes·JVM·이벤트 스트리밍을 공부하며 정리하는 개발 블로그. https://hongjeZZ.github.io
 
-A minimal, ready-to-use template for creating a blog with the [**Chirpy**][chirpy] Jekyll theme. Get up and running in minutes with all critical files pre-configured.
+## 구성
 
-## Why This Starter Exists
+- Jekyll 4.3 + `jekyll-feed`·`jekyll-seo-tag`·`jekyll-sitemap`. 별도 테마 gem 없음.
+- 레이아웃 `_layouts/`(default·home·page·post) + 단일 CSS `assets/css/style.css`.
+- 글은 `_posts/YYYY-MM-DD-slug.md`, permalink `/posts/:title/`.
+- 커버 이미지는 본문 첫 이미지(`assets/img/<slug>/`)를 홈 썸네일로 자동 사용.
 
-When installing Chirpy through [RubyGems.org][gem], Jekyll can only read a subset of theme files (`_data`, `_layouts`, `_includes`, `_sass`, `assets`) and limited `_config.yml` options from the gem. As a result, users cannot enjoy the full out-of-the-box experience that Chirpy offers.
+## 로컬 실행 (Docker, 시스템 Ruby 불필요)
 
-To unlock all features, the following files must be present in your Jekyll site:
+- `./bin/serve` — http://localhost:4000 미리보기, 저장 시 자동 새로고침
+- `./bin/build` — CI와 동일한 프로덕션 빌드 + htmlproofer 검사
 
-```shell
-.
-├── _config.yml
-├── _plugins
-├── _tabs
-└── index.html
-```
+## 배포
 
-This starter bundles those files from the latest **Chirpy** release along with a [CD][CD] workflow, so you can start writing immediately.
-
-## Usage
-
-Check out the [theme's docs](https://github.com/cotes2020/jekyll-theme-chirpy/wiki).
-
-## Contributing
-
-This repository is automatically updated with new releases from the theme repository. If you encounter any issues or want to contribute to its improvement, please visit the [theme repository][chirpy] to provide feedback.
-
-## License
-
-This work is published under [MIT][mit] License.
-
-[gem]: https://rubygems.org/gems/jekyll-theme-chirpy
-[chirpy]: https://github.com/cotes2020/jekyll-theme-chirpy/
-[CD]: https://en.wikipedia.org/wiki/Continuous_deployment
-[mit]: https://github.com/cotes2020/chirpy-starter/blob/master/LICENSE
+`main`에 push되면 `.github/workflows/pages-deploy.yml`이 빌드·htmlproofer 검사 후 GitHub Pages에 배포한다. PR은 빌드·검사만 수행한다.
