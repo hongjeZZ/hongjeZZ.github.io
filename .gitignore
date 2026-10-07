@@ -34,3 +34,6 @@ assets/js/dist
 
 # blog-publish 워크플로 스크래치 (초안·리포트 — 발행 전 임시)
 .pipeline/
+
+# macOS
+.DS_Store
