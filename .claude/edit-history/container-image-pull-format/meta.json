@@ -1,0 +1,13 @@
+{
+ "slug": "container-image-pull-format",
+ "archetype": "cite-only",
+ "mode": "cite-only",
+ "title": "컨테이너 이미지 포맷과 Registry Pull 프로토콜 (OCI Image Spec)",
+ "frozen_at": "2026-07-04T11:44:44Z",
+ "draft_sha": "3b6e2a005257f41b6fdeb16fd8e55783cbe291f3",
+ "source_wiki": "container-image-pull-format",
+ "published_path": "_posts/2026-07-04-container-image-pull-format.md",
+ "paired_at": "2026-07-05T12:32:36.280390Z",
+ "state": "paired",
+ "published_sha": "f4e7c069aa9a5960e86c15922b1aee771823d3ce"
+}

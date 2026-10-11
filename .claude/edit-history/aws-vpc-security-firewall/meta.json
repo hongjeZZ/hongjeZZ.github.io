@@ -1,0 +1,13 @@
+{
+ "slug": "aws-vpc-security-firewall",
+ "archetype": "cite-only",
+ "mode": "cite-only",
+ "title": "AWS VPC 방화벽: Security Group과 Network ACL",
+ "frozen_at": "2026-07-03T10:29:08Z",
+ "draft_sha": "ba121b6776631782a7d058bc469419f807a2e1ad",
+ "source_wiki": "aws-vpc-security-firewall",
+ "published_path": "_posts/2026-07-01-aws-vpc-3.md",
+ "paired_at": "2026-07-03T10:37:52.053793Z",
+ "state": "paired",
+ "published_sha": "5704ccf7d58e43fd1abf8d81b51de258923c7c91"
+}

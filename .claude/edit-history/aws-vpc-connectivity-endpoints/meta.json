@@ -1,0 +1,13 @@
+{
+ "slug": "aws-vpc-connectivity-endpoints",
+ "archetype": "cite-only",
+ "mode": "cite-only",
+ "title": "AWS VPC 연결성: Peering·Transit Gateway·VPC Endpoint/PrivateLink·VPN·Direct Connect·DNS",
+ "frozen_at": "2026-07-04T11:50:53Z",
+ "draft_sha": "41331b3e4575ee368b3a4a5dbe0325fc012f4a70",
+ "source_wiki": "aws-vpc-connectivity-endpoints",
+ "published_path": "_posts/2026-07-04-aws-vpc-4.md",
+ "paired_at": "2026-07-04T11:52:21.659068Z",
+ "state": "paired",
+ "published_sha": "53de56c4822744c6a0ecbfe6e3e21113fbb07693"
+}

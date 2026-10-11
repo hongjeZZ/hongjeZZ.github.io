@@ -1,0 +1,15 @@
+{
+ "slug": "multi-drm-standards",
+ "archetype": "cite-only",
+ "mode": "cite-only",
+ "title": "멀티-DRM 표준 정리",
+ "frozen_at": "2026-07-07T09:42:01Z",
+ "draft_sha": "3181f8c7f83128c704bcb0e6875a4ee5e953f4e4",
+ "source_wiki": "multi-drm-standards",
+ "published_path": "_posts/2026-07-07-multi-drm-standards.md",
+ "paired_at": "2026-07-08T08:04:58+09:00",
+ "state": "paired",
+ "published_sha": "f92fe397ba22550950b2c7a05b2b54719b741b6b",
+ "backfilled_at": "2026-10-07T23:09:14Z",
+ "note": "FREEZE 없이 발행된 글을 .pipeline 초안 + _posts 완성본으로 사후 짝지음"
+}

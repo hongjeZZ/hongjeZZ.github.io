@@ -1,0 +1,13 @@
+{
+ "slug": "argo-cd-core",
+ "archetype": "B",
+ "mode": "own",
+ "title": "Argo CD 정리",
+ "frozen_at": "2026-07-14T23:44:31Z",
+ "draft_sha": "bc407f46fc289e9184583fa2cafca8991df50b95",
+ "source_wiki": "argo-cd-core",
+ "published_path": "_posts/2026-07-15-argo-cd.md",
+ "paired_at": "2026-07-15T00:02:20.981390Z",
+ "state": "paired",
+ "published_sha": "c9417a8197b7a80b69b4b8fbe5e709ed6cee98b8"
+}

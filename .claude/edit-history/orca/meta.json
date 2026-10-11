@@ -1,0 +1,13 @@
+{
+ "slug": "orca",
+ "archetype": "cite-only",
+ "mode": "cite-only",
+ "title": "Orca: 병렬 코딩 에이전트 오케스트레이션 ADE",
+ "frozen_at": "2026-07-11T06:52:02Z",
+ "draft_sha": "a644cd7539bd412594b03643a98c37a80b4993c4",
+ "source_wiki": "orca",
+ "published_path": "_posts/2026-07-11-orca.md",
+ "paired_at": "2026-07-11T06:57:39.220678Z",
+ "state": "paired",
+ "published_sha": "fc4570b740e939aac5f1f8601c83d8f8431f84a2"
+}

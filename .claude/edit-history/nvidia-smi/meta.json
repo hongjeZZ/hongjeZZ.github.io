@@ -1,0 +1,22 @@
+{
+ "slug": "nvidia-smi",
+ "archetype": "cite-only",
+ "mode": "cite-only",
+ "title": "nvidia-smi 정리: 기본 출력·쿼리·모니터링부터 관리 명령·MIG·토폴로지까지",
+ "frozen_at": "2026-07-03T11:21:17Z",
+ "draft_sha": "5f91cb9f1af94b7ee86b157e21d086066be7bfd0",
+ "source_wiki": "nvidia-smi",
+ "published_path": "_posts/2026-06-30-nvidia-smi.md",
+ "paired_at": "2026-07-05T12:32:36.230250Z",
+ "state": "paired",
+ "previous": {
+  "title": "nvidia-smi 레퍼런스: 출력 필드부터 MIG·토폴로지·관리 명령까지",
+  "frozen_at": "2026-06-30T23:33:10Z",
+  "draft_sha": "c42049a4b31ca68d80de5bf110686b5f9540c2ce",
+  "published_path": "_posts/2026-06-30-nvidia-smi.md",
+  "paired_at": "2026-07-01T08:03:47.589158Z",
+  "state": "paired",
+  "published_sha": "90bae867063d75f693c9a7b09ca4c27be76160e1"
+ },
+ "published_sha": "f4e7c069aa9a5960e86c15922b1aee771823d3ce"
+}

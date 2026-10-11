@@ -1,0 +1,81 @@
+{
+  "_note": "블로그 분류 SSOT — taxonomy-lint.py가 읽는다. 사용자가 직접 수정하는 파일. 표기 정책: 고유명사=공식 표기(Kubernetes·CRD·Argo Workflows), 일반 개념=한글(큐·동시성·메모이제이션).",
+
+  "categories": {
+    "Back-End": ["Spring"],
+    "CS": ["시스템", "자료구조·알고리즘", "네트워크"],
+    "PS": ["백준", "프로그래머스"],
+    "Infra": ["Kubernetes", "AWS", "GPU", "AI-Agent", "데이터 파이프라인"],
+    "기타": []
+  },
+
+  "ps_categories": ["PS", "백준", "프로그래머스"],
+
+  "_tag_aliases_note": "surface(어떤 표기든) → canonical. lint는 키를 정규화(소문자·공백/하이픈/·제거)해 매칭하므로 'spring boot'·'Spring-Boot'·'springboot'가 모두 잡힌다. 값이 최종 정답 표기.",
+  "tag_aliases": {
+    "k8s": "Kubernetes", "kubernetes": "Kubernetes", "쿠버네티스": "Kubernetes",
+    "crd": "CRD", "rbac": "RBAC",
+    "argocd": "Argo CD", "argo-cd": "Argo CD",
+    "argo-workflows": "Argo Workflows", "워크플로우": "Argo Workflows",
+    "spring": "Spring", "springboot": "Spring Boot", "spring boot": "Spring Boot",
+    "spring security": "Spring Security",
+    "docker": "Docker", "helm": "Helm", "git": "Git",
+    "mcp": "MCP", "sdd": "SDD", "spec-driven-development": "SDD",
+    "oci": "OCI", "cli": "CLI", "dns": "DNS", "vpn": "VPN", "gpu": "GPU",
+    "nvidia": "NVIDIA", "nvml": "NVML", "dcgm": "DCGM", "mig": "MIG", "cri": "CRI",
+    "rest api": "REST API", "restapi": "REST API",
+    "operator-pattern": "Operator 패턴",
+    "custom-controller": "커스텀 컨트롤러",
+    "reconciliation-loop": "재조정 루프", "reconciliation": "재조정 루프",
+    "container": "컨테이너", "image": "이미지", "registry": "레지스트리",
+    "operator-sdk": "Operator SDK", "kubebuilder": "Kubebuilder",
+    "ai-coding": "AI 코딩", "agent-harness": "에이전트 하네스",
+    "ai-agent-framework": "AI 에이전트 프레임워크",
+    "personal-assistant": "개인 비서",
+    "multi-channel-messaging": "멀티채널 메시징",
+    "self-hosted": "셀프호스팅", "gateway-pattern": "게이트웨이 패턴"
+  },
+
+  "_proper_nouns_note": "공식 표기 고유명사. tag-style 검사가 소문자/kebab 변형을 이 목록의 정답 표기로 유도한다.",
+  "proper_nouns": [
+    "Kubernetes", "CRD", "RBAC", "Argo Workflows", "Argo CD", "Kafka",
+    "Spring", "Spring Boot", "Spring Security", "MongoDB", "Redis",
+    "AWS", "VPC", "GPU", "NVIDIA", "NVML", "DCGM", "MIG",
+    "Docker", "Helm", "Git", "MCP", "SDD", "OCI", "CLI", "DNS", "VPN", "CRI", "CRI-O",
+    "STOMP", "JMeter", "REST API", "IPv6", "ENI", "CIDR", "Cache", "ZonedDateTime",
+    "NAT Gateway", "Internet Gateway", "Elastic IP", "Route Table",
+    "Security Group", "Network ACL", "Transit Gateway", "PrivateLink",
+    "VPC Endpoint", "Direct Connect", "Subnet", "Peering", "Firewall",
+    "Kubebuilder", "Operator SDK"
+  ],
+
+  "_lowercase_ok_note": "공식 표기 자체가 소문자인 식별자 — tag-style 검사에서 제외(오탐 방지).",
+  "lowercase_ok": [
+    "containerd", "kubelet", "runc", "cri-o", "client-go", "nvidia-smi",
+    "overlayfs", "imagepullpolicy", "logback", "runc",
+    "cladding", "ironclad", "openclaw",
+    "garbage-collection", "image-cache", "pod-sandbox"
+  ],
+
+  "title": {
+    "_note": "개념·학습 정리 글 제목 컨벤션 — 간결하게, 직접 쓴 느낌. PS(백준/프로그래머스) 글은 검사 제외.",
+    "max_len": 40,
+    "concept_suffixes": ["정리", "비교", "입문", "개념", "구조", "원리", "차이", "요약", "동작", "흐름", "톺아보기"],
+    "banned": [
+      "완벽 가이드", "완벽 정리", "완전 정복", "완전정복", "총정리",
+      "한 방에", "한방에", "알아보자", "파헤치기", "마스터",
+      "학습 노트", "학습노트", "학습 정리", "공식 문서로 학습", "공식 문서로",
+      "정리해보자", "정리해봤", "심층 분석", "끝장", "제대로"
+    ]
+  },
+
+  "_severity_note": "각 검사의 심각도. block=수정 필요(exit 1), warn=검토 권장, nit=참고. 필요하면 여기서 조정.",
+  "severity": {
+    "fragmentation": "block",
+    "alias": "block",
+    "unknown_category": "block",
+    "category_structure": "warn",
+    "tag_style": "warn",
+    "title": "warn"
+  }
+}

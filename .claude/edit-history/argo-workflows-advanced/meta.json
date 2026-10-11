@@ -1,0 +1,13 @@
+{
+ "slug": "argo-workflows-advanced",
+ "archetype": "cite-only",
+ "mode": "cite-only",
+ "title": "Argo Workflows 고급 기능 및 운영 패턴 정리 - 2",
+ "frozen_at": "2026-06-28T04:16:23Z",
+ "draft_sha": "f6665508efb4fc823c3a132448ea1c2234d2dc8c",
+ "source_wiki": "argo-workflows-advanced",
+ "published_path": "_posts/2026-06-28-argo-workflow-2.md",
+ "paired_at": "2026-07-04T10:20:54.928240Z",
+ "state": "paired",
+ "published_sha": "51250ce135b357a61dc6da3119343f7fd0be7c71"
+}

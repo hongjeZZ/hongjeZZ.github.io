@@ -1,0 +1,8 @@
+# voice 골든 허용 목록 — 사용자가 in-voice(목표 문체)로 확인한 AI-보조 글.
+# 2026-06-30: 공식 문서체 전환에 따라, 비인칭 선언형 발행글을 골든에 편입해
+# baseline을 '개인 서사형 Spring 8편' → '공식 문서체'로 이동(역방향 톤 처벌 제거).
+2026-06-28-aws-vpc.md
+2026-06-28-aws-vpc-2.md
+2026-06-21-argo-workflow.md
+2026-06-28-argo-workflow-2.md
+2026-06-30-nvidia-smi.md

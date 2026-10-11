@@ -1,0 +1,54 @@
+#!/bin/sh
+# 블로그 발행 게이트 (pre-commit) — staged _posts/*.md 를 검사한다:
+#   1) 기밀 게이트(Gate2, provenance-gate.py) — 시크릿·PII·사내정보 적중 시 차단.
+#   2) taxonomy 게이트(taxonomy-lint.py) — 태그 파편화·alias·카테고리 오류 적중 시 차단(제목·스타일 경고는 비차단).
+# 어느 경로로 발행하든(수동 commit / draft-post / ingest-to-blog) 자동으로 돈다.
+# 이 파일은 정본. 활성화: ln -sf ../../.claude/hooks/pre-commit .git/hooks/pre-commit
+# 의식적 우회: ALLOW_PUBLISH=1 git commit ...   (CLAUDE.md의 --no-verify 금지와 일관 — 우회는 명시적 env로만)
+[ "$ALLOW_PUBLISH" = "1" ] && exit 0
+ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+command -v python3 >/dev/null 2>&1 || exit 0
+staged=$(git diff --cached --name-only --diff-filter=AM | grep '^_posts/.*\.md$')
+[ -z "$staged" ] && exit 0
+
+# ── 1) 기밀 게이트 ──
+GATE="$ROOT/.claude/provenance-gate.py"
+if [ -f "$GATE" ]; then
+  sfail=0
+  for f in $staged; do
+    out=$(python3 "$GATE" "$ROOT/$f" --wiki "$HOME/dev/llm-wiki" 2>/dev/null)
+    if printf '%s' "$out" | grep -q 'GATE2 기밀: ⛔'; then
+      echo "⛔ $f — 기밀 deny-list 적중. 발행 차단."
+      printf '%s\n' "$out" | sed -n '/GATE2/,/VERDICT/p'
+      sfail=1
+    fi
+  done
+  if [ "$sfail" = "1" ]; then
+    echo ""
+    echo "회사명·내부 제품/코드명·티켓ID·시크릿·PII를 제거/익명화한 뒤 다시 commit하세요."
+    echo "(의식적 우회가 필요하면: ALLOW_PUBLISH=1 git commit ...)"
+    exit 1
+  fi
+fi
+
+# ── 2) taxonomy 게이트 (파편화·alias·카테고리만 차단; 제목·스타일 경고는 /lint-blog 로) ──
+TAXLINT="$ROOT/.claude/taxonomy-lint.py"
+if [ -f "$TAXLINT" ]; then
+  tfail=0
+  for f in $staged; do
+    base=$(basename "$f")
+    nblock=$(python3 "$TAXLINT" --post "$base" --json 2>/dev/null | python3 -c "import json,sys;print(len(json.load(sys.stdin).get('block',[])))" 2>/dev/null || echo 0)
+    if [ "${nblock:-0}" -gt 0 ]; then
+      echo "⛔ $f — 태그 파편화/카테고리 오류 ${nblock}건. 발행 차단."
+      python3 "$TAXLINT" --post "$base" 2>/dev/null | grep -iE '\[(alias|fragmentation|category)\]|→ '
+      tfail=1
+    fi
+  done
+  if [ "$tfail" = "1" ]; then
+    echo ""
+    echo "태그 통일: python3 .claude/taxonomy-lint.py --fix   (제목·카테고리는 수동)"
+    echo "(의식적 우회가 필요하면: ALLOW_PUBLISH=1 git commit ...)"
+    exit 1
+  fi
+fi
+exit 0

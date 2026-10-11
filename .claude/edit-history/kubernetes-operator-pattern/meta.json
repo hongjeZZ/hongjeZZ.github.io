@@ -1,0 +1,13 @@
+{
+ "slug": "kubernetes-operator-pattern",
+ "archetype": "cite-only",
+ "mode": "cite-only",
+ "title": "Kubernetes Operator 패턴: CRD·재조정 루프·성숙도 모델",
+ "frozen_at": "2026-07-05T04:52:09Z",
+ "draft_sha": "7ddf211f934c1cb98e67c153ab544d8cf61af65f",
+ "source_wiki": "kubernetes-operator-pattern",
+ "published_path": "_posts/2026-07-05-kubernetes-operator-pattern.md",
+ "paired_at": "2026-07-05T12:32:36.353826Z",
+ "state": "paired",
+ "published_sha": "f4e7c069aa9a5960e86c15922b1aee771823d3ce"
+}

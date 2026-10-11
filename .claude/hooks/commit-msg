@@ -1,0 +1,17 @@
+#!/bin/sh
+# hongjeZZ 단독 기여 하네스 — 커밋 메시지에서 모든 Co-Authored-By 트레일러(Claude·Anthropic 포함)와
+# "Generated with Claude Code" 류 표기를 제거한다. GitHub 기여자 목록은 author/committer + Co-Authored-By로
+# 집계되므로, 이 트레일러를 지우면 hongjeZZ만 기여자로 남는다.
+#
+# 이 파일은 추적용 정본(.gitignore로 .claude/는 제외되므로 로컬 전용).
+# 활성화: ln -sf ../../.claude/hooks/commit-msg .git/hooks/commit-msg && chmod +x .claude/hooks/commit-msg
+F="$1"
+[ -f "$F" ] || exit 0
+
+tmp="$F.cleanup"
+# 1) Co-Authored-By 트레일러 + "Generated with ... Claude Code" 줄 제거 (대소문자 무관)
+grep -viE '^[[:space:]]*Co-Authored-By:[[:space:]]|Generated with .*Claude Code' "$F" > "$tmp"
+# 2) 트레일러 제거로 생긴 말미 빈 줄 정리 (awk — BSD/GNU 이식성)
+awk 'BEGIN{n=0} {a[++n]=$0} END{while(n>0 && a[n] ~ /^[[:space:]]*$/) n--; for(i=1;i<=n;i++) print a[i]}' "$tmp" > "$F"
+rm -f "$tmp"
+exit 0

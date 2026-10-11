@@ -1,0 +1,23 @@
+{
+ "slug": "aws-vpc-edge-nat",
+ "archetype": "cite-only",
+ "mode": "cite-only",
+ "title": "AWS VPC 정리 - 2",
+ "frozen_at": "2026-07-04T10:57:50Z",
+ "draft_sha": "e50dfc63ccc42daa6f07f3c145a4fccb7eb8c0cf",
+ "source_wiki": "aws-vpc-edge-nat",
+ "published_path": "_posts/2026-06-28-aws-vpc-2.md",
+ "paired_at": "2026-07-04T11:22:51.006804Z",
+ "state": "paired",
+ "history": [
+  {
+   "frozen_at": "2026-06-28T05:48:47Z",
+   "draft_sha": "7e98732072d632970024ebd9b94dd76ccc5e548f",
+   "published_path": "_posts/2026-06-28-aws-vpc-2.md",
+   "paired_at": "2026-07-01T00:35:58.007202Z",
+   "state": "paired",
+   "published_sha": "bf9c14e0d202670d01a46545f23cc95349a9f550"
+  }
+ ],
+ "published_sha": "9bd55b5ca7f47fa3fca0953c20570d8705495f07"
+}

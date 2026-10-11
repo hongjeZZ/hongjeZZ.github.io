@@ -1,0 +1,13 @@
+{
+ "slug": "cladding-doc-suite",
+ "archetype": "cite-only",
+ "mode": "cite-only",
+ "title": "cladding — host LLM을 감싸는 spec-driven 거버넌스 하네스 (v0.6.0)",
+ "frozen_at": "2026-07-05T09:35:28Z",
+ "draft_sha": "0b6593a32957adb75c1c9454ba1621ddd75db4b3",
+ "source_wiki": "cladding-doc-suite",
+ "published_path": "_posts/2026-07-05-cladding.md",
+ "paired_at": "2026-07-05T12:32:36.328560Z",
+ "state": "paired",
+ "published_sha": "f4e7c069aa9a5960e86c15922b1aee771823d3ce"
+}

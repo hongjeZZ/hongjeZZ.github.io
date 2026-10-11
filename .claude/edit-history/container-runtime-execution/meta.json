@@ -1,0 +1,23 @@
+{
+ "slug": "container-runtime-execution",
+ "archetype": "cite-only",
+ "mode": "cite-only",
+ "title": "컨테이너 런타임 실행 경로: CRI·containerd·CRI-O·runc",
+ "frozen_at": "2026-07-03T11:45:55Z",
+ "draft_sha": "2c7b5db5ac0bae6b0bc9c7a2a8465be6ff6e55e0",
+ "source_wiki": "container-runtime-execution",
+ "published_path": "_posts/2026-07-03-container-runtime-execution.md",
+ "paired_at": "2026-07-05T12:32:36.255228Z",
+ "state": "paired",
+ "history": [
+  {
+   "frozen_at": "2026-07-03T07:43:50Z",
+   "draft_sha": "2dc7f19bc34eb94d48e10615f97ca88fc541823c",
+   "published_path": "_posts/2026-07-03-container-runtime-execution.md",
+   "paired_at": "2026-07-03T09:33:43.960460Z",
+   "state": "paired",
+   "published_sha": "18b3ab1668afad5d993f62a8dea4319171e8fbca"
+  }
+ ],
+ "published_sha": "f4e7c069aa9a5960e86c15922b1aee771823d3ce"
+}

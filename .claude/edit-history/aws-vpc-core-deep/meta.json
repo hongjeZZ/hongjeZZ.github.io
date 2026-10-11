@@ -1,0 +1,13 @@
+{
+ "slug": "aws-vpc-core-deep",
+ "archetype": "cite-only",
+ "mode": "cite-only",
+ "title": "AWS VPC 코어 심화: Subnet 유형·CIDR/IPv6·Route Table",
+ "frozen_at": "2026-07-04T05:40:32Z",
+ "draft_sha": "b14a3ddf7a795ddd0099c17274fe901e6b9b49e5",
+ "source_wiki": "aws-vpc-core-deep",
+ "published_path": "_posts/2026-06-28-aws-vpc.md",
+ "paired_at": "2026-07-04T05:44:42.181920Z",
+ "state": "paired",
+ "published_sha": "8d06113ffbd06ea88a8122d83232fe9419ad8a45"
+}

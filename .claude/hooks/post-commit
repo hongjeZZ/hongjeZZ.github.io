@@ -1,0 +1,33 @@
+#!/bin/sh
+# 수정-학습 PAIR 캡처 — _posts/ 발행 커밋 시, 동결된 에이전트 초안(D)과 발행 완성본(F)을 짝짓는다.
+# 비차단(항상 exit 0), cp + meta 갱신만(LLM 없음). 손글/비-AI 발행은 매칭 디렉터리가 없어 no-op.
+# 매칭: ① 파일명 slug(YYYY-MM-DD- 제거) ② 실패 시 published 글의 source_wiki frontmatter(발행 시 rename 대비).
+# 활성화: ln -sf ../../.claude/hooks/post-commit .git/hooks/post-commit && chmod +x .claude/hooks/post-commit
+ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+[ -d "$ROOT/.claude/edit-history" ] || exit 0
+for f in $(git diff-tree --no-commit-id --name-only -r HEAD --diff-filter=AM 2>/dev/null | grep '^_posts/.*\.md$'); do
+  python3 - "$ROOT" "$f" "$(git rev-parse HEAD)" <<'PY' 2>/dev/null || true
+import json, os, re, sys, datetime
+root, f, sha = sys.argv[1:4]
+EH = os.path.join(root, '.claude', 'edit-history')
+txt = open(os.path.join(root, f), encoding='utf-8', errors='ignore').read()
+base = re.sub(r'^\d{4}-\d{2}-\d{2}-', '', os.path.basename(f))[:-3]
+m = re.search(r'^source_wiki:\s*"?([\w-]+)"?', txt, re.M)
+for slug in [base] + ([m.group(1)] if m else []):
+    d = os.path.join(EH, slug)
+    if os.path.isdir(d):
+        open(os.path.join(d, 'published.md'), 'w', encoding='utf-8').write(txt)
+        mp = os.path.join(d, 'meta.json')
+        meta = json.load(open(mp)) if os.path.exists(mp) else {'slug': slug}
+        meta.update(published_path=f, published_sha=sha,
+                    paired_at=datetime.datetime.utcnow().isoformat() + 'Z', state='paired')
+        json.dump(meta, open(mp, 'w'), ensure_ascii=False, indent=1)
+        line = json.dumps({'slug': slug, 'state': 'paired'}) + '\n'
+        ip = os.path.join(EH, '_index.jsonl')
+        if line not in (open(ip).read() if os.path.exists(ip) else ''):
+            open(ip, 'a').write(line)
+        print('\U0001F4DD 수정-학습 캡처: ' + slug + ' (초안↔완성본 짝지음) — /learn-from-edits 로 학습')
+        break
+PY
+done
+exit 0

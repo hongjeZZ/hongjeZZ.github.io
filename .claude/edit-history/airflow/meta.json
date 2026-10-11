@@ -1,0 +1,13 @@
+{
+ "slug": "airflow",
+ "archetype": "B",
+ "mode": "own",
+ "title": "Apache Airflow 정리",
+ "frozen_at": "2026-07-06T06:26:33Z",
+ "draft_sha": "ac4560b0b439b3ce9f73b8f424bd9446c6420de4",
+ "source_wiki": "airflow",
+ "published_path": "_posts/2026-07-06-airflow.md",
+ "paired_at": "2026-07-06T06:52:03.057061Z",
+ "state": "paired",
+ "published_sha": "b7e48441edc5334a94e93a73421f33137797b34a"
+}

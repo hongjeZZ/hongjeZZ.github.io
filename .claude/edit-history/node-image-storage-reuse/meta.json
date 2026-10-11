@@ -1,0 +1,15 @@
+{
+ "slug": "node-image-storage-reuse",
+ "archetype": "cite-only",
+ "mode": "cite-only",
+ "title": "노드는 컨테이너 이미지를 어떻게 저장·공유·정리하는가",
+ "frozen_at": "2026-07-04T12:07:41Z",
+ "draft_sha": "3fb981b56b97ca9f23b5ff3c9b1988dcfb915dab",
+ "source_wiki": "node-image-storage-reuse",
+ "published_path": "_posts/2026-07-04-node-image-storage-reuse.md",
+ "paired_at": "2026-07-05T12:04:22+09:00",
+ "state": "paired",
+ "published_sha": "3fbff203aece811c7488f9cb687be1b5381979cd",
+ "backfilled_at": "2026-10-07T23:09:14Z",
+ "note": "FREEZE 없이 발행된 글을 .pipeline 초안 + _posts 완성본으로 사후 짝지음"
+}
