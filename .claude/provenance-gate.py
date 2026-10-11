@@ -204,6 +204,7 @@ def main():
     ap.add_argument('--overlap', nargs=2, metavar=('DRAFT', 'SOURCE'))
     ap.add_argument('--backfill', action='store_true', help='미stamp 페이지에 provenance 추정값 기록 (own은 제외)')
     ap.add_argument('--write', action='store_true', help='--backfill을 실제로 파일에 기록 (없으면 dry-run)')
+    ap.add_argument('--skip-regex', action='store_true', help='Gate2에서 regex: 항목(범용 패턴) 제외, 단어 항목만 검사 — pre-commit ALLOW_PUBLISH=1 우회용')
     a = ap.parse_args()
     wiki = os.path.expanduser(a.wiki)
 
@@ -267,6 +268,7 @@ def main():
     print(f"GATE1 출처: {label}   [{how}]")
     for p, s in detail: print(f"   - {p:12s} {s}")
     deny = load_deny(a.deny)
+    if a.skip_regex: deny = [d for d in deny if d[0] == 'word']
     _raw = open(cand, encoding='utf-8', errors='ignore').read()
     # 위키 페이지의 Connections/Open Questions(내부 페이지로의 [[wikilink]] 상호참조)는 발행될 본문이 아니므로
     # Gate2(기밀)에서 제외하고 발행 본문만 스캔한다. 초안(_posts)엔 이 헤딩이 없어 전체 스캔과 동일.

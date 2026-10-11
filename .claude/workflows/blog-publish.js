@@ -1,6 +1,6 @@
 export const meta = {
   name: 'blog-publish',
-  description: '위키 페이지 → 블로그 초안 자동 파이프라인: 출처 게이트 → quality-profile 초안 → 백테스트 루프(품질·표절·기밀·보이스·사실, clean까지 반복) → 리포트. 발행은 사람 PR + git hook 게이트 유지.',
+  description: '위키 페이지 → 블로그 초안 자동 파이프라인: 출처 게이트 → quality-profile 초안 → 백테스트 루프(품질·표절·기밀·보이스·사실, clean까지 반복) → 리포트. 발행은 호출자 몫(사람 PR, 또는 위키 /ingest-to-blog가 post-reviewer 통과 후 PR·머지) + git hook 게이트.',
   whenToUse: '위키 한 페이지를 블로그 글로 만들 때. args:{slug, rounds?}. mode(own/cite-only)는 게이트가 자동 판정.',
   phases: [
     { title: 'Gate', detail: '출처/기밀 게이트 (provenance-gate.py)' },
@@ -219,7 +219,7 @@ await agent(
   now=$(date -u +%Y-%m-%dT%H:%M:%SZ); sha=$(git -C ${BLOG} hash-object ${DRAFT} 2>/dev/null || md5 -q ${DRAFT})
 그 뒤 ${EH}/meta.json 에 JSON Write(이미 있으면 덮어쓰기):
   {"slug":"${slug}","archetype":"${draft.archetype}","mode":"${gate.mode}","title":${JSON.stringify(draft.title)},"frozen_at":"<now>","draft_sha":"<sha>","source_wiki":"${slug}","published_path":null,"paired_at":null,"state":"frozen"}
-초안 frontmatter에 source_wiki:${slug}가 있으니, 발행 시 파일명을 바꿔도 post-commit 훅이 그 값으로 역매칭한다.
+초안 frontmatter에 source_wiki:${slug}가 있으니, 발행 시 파일명을 바꿔도 pre-commit 훅이 그 값으로 역매칭한다.
 한 줄 요약 반환.`,
   { label: `freeze:${slug}`, phase: 'Report' })
 

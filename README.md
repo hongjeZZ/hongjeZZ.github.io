@@ -17,3 +17,7 @@
 ## 배포
 
 `main`에 push되면 `.github/workflows/pages-deploy.yml`이 빌드·htmlproofer 검사 후 GitHub Pages에 배포한다. PR은 빌드·검사만 수행한다.
+
+## 발행 하네스
+
+`.claude/`에 발행 파이프라인(커맨드·워크플로·최종 검토 서브에이전트)과 git 훅이 있다. 훅은 `git config core.hooksPath .claude/hooks`로 켠다(llm-wiki의 `agent_memory.py install`이 두 기계 모두 자동 설정). pre-commit은 기밀·taxonomy 게이트와 수정-학습 짝 캡처, commit-msg는 공동저자 트레일러 제거.

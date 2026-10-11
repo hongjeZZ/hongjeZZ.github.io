@@ -11,20 +11,9 @@ _site
 # RubyGems
 *.gem
 
-# NPM dependencies
-node_modules
-package-lock.json
-
 # IDE configurations
 .idea
-.vscode/*
-!.vscode/settings.json
-!.vscode/extensions.json
-!.vscode/tasks.json
-
-# Misc
-_sass/vendors
-assets/js/dist
+.vscode/
 
 # Claude Code 하네스(.claude/)는 커밋한다. 사내 용어 차단 목록 blog-sensitive-terms.txt는
 # 비공개 위키(~/dev/llm-wiki/.claude/)를 가리키는 링크만 커밋된다. 로컬 전용만 제외:
