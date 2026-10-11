@@ -3,8 +3,8 @@
 # "Generated with Claude Code" 류 표기를 제거한다. GitHub 기여자 목록은 author/committer + Co-Authored-By로
 # 집계되므로, 이 트레일러를 지우면 hongjeZZ만 기여자로 남는다.
 #
-# 이 파일은 추적용 정본(.gitignore로 .claude/는 제외되므로 로컬 전용).
-# 활성화: ln -sf ../../.claude/hooks/commit-msg .git/hooks/commit-msg && chmod +x .claude/hooks/commit-msg
+# 이 파일은 정본(저장소에 커밋됨).
+# 활성화: git config core.hooksPath .claude/hooks — ~/dev/llm-wiki agent_memory.py(install·보충 루틴)가 두 기계 모두 자동 설정.
 F="$1"
 [ -f "$F" ] || exit 0
 

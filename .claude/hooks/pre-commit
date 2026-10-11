@@ -2,10 +2,12 @@
 # 블로그 발행 게이트 (pre-commit) — staged _posts/*.md 를 검사한다:
 #   1) 기밀 게이트(Gate2, provenance-gate.py) — 시크릿·PII·사내정보 적중 시 차단.
 #   2) taxonomy 게이트(taxonomy-lint.py) — 태그 파편화·alias·카테고리 오류 적중 시 차단(제목·스타일 경고는 비차단).
+#   3) 수정-학습 PAIR 캡처 — 게이트 통과 시 edit-history 짝(published.md·meta.json·_index.jsonl)을 같은 커밋에 git add(비차단).
 # 어느 경로로 발행하든(수동 commit / draft-post / ingest-to-blog) 자동으로 돈다.
-# 이 파일은 정본. 활성화: ln -sf ../../.claude/hooks/pre-commit .git/hooks/pre-commit
+# 이 파일은 정본.
+# 활성화: git config core.hooksPath .claude/hooks — ~/dev/llm-wiki agent_memory.py(install·보충 루틴)가 두 기계 모두 자동 설정.
 # 의식적 우회: ALLOW_PUBLISH=1 git commit ...   (CLAUDE.md의 --no-verify 금지와 일관 — 우회는 명시적 env로만)
-[ "$ALLOW_PUBLISH" = "1" ] && exit 0
+#   우회 범위: deny-list의 regex: 항목(IP·시크릿 필드 같은 범용 패턴 오탐)과 taxonomy만 건너뛴다. 단어 항목(회사·제품·API명)은 우회해도 차단.
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
 command -v python3 >/dev/null 2>&1 || exit 0
 staged=$(git diff --cached --name-only --diff-filter=AM | grep '^_posts/.*\.md$')
@@ -15,8 +17,9 @@ staged=$(git diff --cached --name-only --diff-filter=AM | grep '^_posts/.*\.md$'
 GATE="$ROOT/.claude/provenance-gate.py"
 if [ -f "$GATE" ]; then
   sfail=0
+  skip=""; [ "$ALLOW_PUBLISH" = "1" ] && skip="--skip-regex"
   for f in $staged; do
-    out=$(python3 "$GATE" "$ROOT/$f" --wiki "$HOME/dev/llm-wiki" 2>/dev/null)
+    out=$(python3 "$GATE" "$ROOT/$f" --wiki "$HOME/dev/llm-wiki" $skip 2>/dev/null)
     if printf '%s' "$out" | grep -q 'GATE2 기밀: ⛔'; then
       echo "⛔ $f — 기밀 deny-list 적중. 발행 차단."
       printf '%s\n' "$out" | sed -n '/GATE2/,/VERDICT/p'
@@ -26,14 +29,14 @@ if [ -f "$GATE" ]; then
   if [ "$sfail" = "1" ]; then
     echo ""
     echo "회사명·내부 제품/코드명·티켓ID·시크릿·PII를 제거/익명화한 뒤 다시 commit하세요."
-    echo "(의식적 우회가 필요하면: ALLOW_PUBLISH=1 git commit ...)"
+    echo "(정규식 항목 오탐이면: ALLOW_PUBLISH=1 git commit ...  — 단어 항목 적중은 우회되지 않음)"
     exit 1
   fi
 fi
 
 # ── 2) taxonomy 게이트 (파편화·alias·카테고리만 차단; 제목·스타일 경고는 /lint-blog 로) ──
 TAXLINT="$ROOT/.claude/taxonomy-lint.py"
-if [ -f "$TAXLINT" ]; then
+if [ "$ALLOW_PUBLISH" != "1" ] && [ -f "$TAXLINT" ]; then
   tfail=0
   for f in $staged; do
     base=$(basename "$f")
@@ -50,5 +53,43 @@ if [ -f "$TAXLINT" ]; then
     echo "(의식적 우회가 필요하면: ALLOW_PUBLISH=1 git commit ...)"
     exit 1
   fi
+fi
+
+# ── 3) 수정-학습 PAIR 캡처 — 동결된 에이전트 초안(D)과 발행 완성본(F)을 짝짓는다 ──
+# 비차단, cp + meta 갱신만(LLM 없음). 손글/비-AI 발행은 매칭 디렉터리가 없어 no-op.
+# 커밋 뒤(post-commit)에 쓰면 추적 파일이 dirty로 남아 main fast-forward가 멈추므로, 여기서 같은 커밋에 git add 한다.
+# 매칭: ① 파일명 slug(YYYY-MM-DD- 제거) ② 실패 시 published 글의 source_wiki frontmatter(발행 시 rename 대비).
+if [ -d "$ROOT/.claude/edit-history" ]; then
+  for f in $staged; do
+    python3 - "$ROOT" "$f" <<'PY' 2>/dev/null || true
+import json, os, re, sys, datetime, subprocess
+root, f = sys.argv[1:3]
+EH = os.path.join(root, '.claude', 'edit-history')
+txt = subprocess.run(['git', 'show', ':' + f], cwd=root, capture_output=True).stdout.decode('utf-8', 'ignore')
+base = re.sub(r'^\d{4}-\d{2}-\d{2}-', '', os.path.basename(f))[:-3]
+m = re.search(r'^source_wiki:\s*"?([\w-]+)"?', txt, re.M)
+for slug in [base] + ([m.group(1)] if m else []):
+    d = os.path.join(EH, slug)
+    if os.path.isdir(d):
+        # ponytail: 부분 커밋(git commit <path>·IDE --only)은 진짜 index가 잠겨 있어 같은 커밋에 넣으면 다음 커밋이 되돌린다 → 캡처 생략(트리 clean 우선)
+        if 'next-index-' in os.environ.get('GIT_INDEX_FILE', ''):
+            print('\U0001F4DD 수정-학습 캡처 생략: ' + slug + ' — 부분 커밋(git commit <path>). git add 후 git commit 하면 짝지어진다')
+            break
+        open(os.path.join(d, 'published.md'), 'w', encoding='utf-8').write(txt)
+        mp = os.path.join(d, 'meta.json')
+        meta = json.load(open(mp)) if os.path.exists(mp) else {'slug': slug}
+        meta.pop('published_sha', None)  # 커밋 전이라 sha를 알 수 없음(읽는 곳 없음)
+        meta.update(published_path=f,
+                    paired_at=datetime.datetime.utcnow().isoformat() + 'Z', state='paired')
+        json.dump(meta, open(mp, 'w'), ensure_ascii=False, indent=1)
+        line = json.dumps({'slug': slug, 'state': 'paired'}) + '\n'
+        ip = os.path.join(EH, '_index.jsonl')
+        if line not in (open(ip).read() if os.path.exists(ip) else ''):
+            open(ip, 'a').write(line)
+        subprocess.run(['git', 'add', '--', d, ip], cwd=root, check=True)
+        print('\U0001F4DD 수정-학습 캡처: ' + slug + ' (초안↔완성본 짝지음, 이 커밋에 포함) — /learn-from-edits 로 학습')
+        break
+PY
+  done
 fi
 exit 0

@@ -1,7 +1,7 @@
 ---
 title: 블로그 발행 정책 — 출처 적격성 + 민감정보 게이트
 version: 0.3-draft
-updated: 2026-06-21
+updated: 2026-10-11
 applies_to: /draft-post 파이프라인의 [선택 → 생성 → 리뷰] 단계
 enforced_by: post-reviewer 서브에이전트(HARD block) + provenance-gate.py(결정론적 1차 필터)
 canonical: "~/dev/hongjeZZ.github.io/.claude/publish-policy.md (정본). 위키 사본은 심볼릭"
@@ -16,7 +16,7 @@ companion: quality-profile.md(품질·방법론), blog-sensitive-terms.txt(deny-
 >
 > **표절의 대상 = 사람이 쓴 "글"이지, 기술의 "사실"이 아니다.** 남의 산문·서사·고유 분석·개인 예제를 베끼는 게 표절이다. 반면 API·스키마·설정·공식 YAML·기술의 객관적 구조 같은 **공개 사실**은 출처를 밝히고 **위키 내용 그대로 충실히 옮겨도 표절이 아니다**(정확하니 오히려 권장). cite-only가 이 사실 레이어까지 "내 예제로 바꿔라"로 축약하게 두지 않는다 — 그게 argo 글이 빈약해진 원인이었다.
 >
-> **⚠ 상태(v0.3)**: 게이트 로직(`provenance-gate.py`)은 fail-closed로 구현·검증됨. 배선 현황: **Gate2(기밀)는 pre-commit 훅이 `_posts/` 커밋 시 자동 차단**(`ALLOW_PUBLISH=1`만 명시적 우회). **Gate1b(표절 overlap)·Gate2는 blog-publish 백테스트 축에서 자동 호출.** 단 post-reviewer 서브에이전트의 HARD block은 사람이 호출하는 경로라, `_posts/` 이동 전 수동 검토(또는 post-reviewer 실행)는 여전히 필수. 자동 "통과"를 맹신하지 말 것. fail-closed.
+> **⚠ 상태(v0.3)**: 게이트 로직(`provenance-gate.py`)은 fail-closed로 구현·검증됨. 배선 현황: **Gate2(기밀)는 pre-commit 훅이 `_posts/` 커밋 시 자동 차단**(`ALLOW_PUBLISH=1`만 명시적 우회). **Gate1b(표절 overlap)·Gate2는 blog-publish 백테스트 축에서 자동 호출.** post-reviewer 서브에이전트의 HARD block은 `_posts/` 이동 전 필수 — `/draft-post` 경로는 사람이 검토(또는 post-reviewer 실행)하고, 위키 `/ingest-to-blog`는 block 0건일 때 post-reviewer를 자동 실행해 PASS여야 PR·머지까지 진행한다. 자동 "통과"를 맹신하지 말 것. fail-closed.
 
 ---
 
@@ -95,7 +95,7 @@ companion: quality-profile.md(품질·방법론), blog-sensitive-terms.txt(deny-
 
 - **결정론적 1차**: `provenance-gate.py`가 `blog-sensitive-terms.txt`의 단어/정규식을 본문에서 grep → 발견 시 차단·표시.
 - **LLM 2차**: post-reviewer가 문맥상 민감 정보를 추가 판단(deny-list에 없어도).
-- 발견 시 **사용자 확인 후에만** 진행. 자동 발행 금지.
+- 발견 시 **사용자 확인 후에만** 진행. 적중 상태로 자동 발행하지 않는다(pre-commit이 커밋을 막는다).
 
 ---
 
