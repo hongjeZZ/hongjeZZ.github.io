@@ -15,19 +15,13 @@ _site
 .idea
 .vscode/
 
-# Claude Code 하네스(.claude/)는 커밋한다. 사내 용어 차단 목록 blog-sensitive-terms.txt는
-# 비공개 위키(~/dev/llm-wiki/.claude/)를 가리키는 링크만 커밋된다. 로컬 전용만 제외:
-.claude/__pycache__/
-.claude/worktrees/
-.claude/settings.local.json
+# Claude Code 로컬 설정
+.claude/
 # Codex 로컬 설정 (범위 제외)
 .codex/
 
 # Docker 로컬 빌드 gem 캐시
 .bundle-cache/
-
-# blog-publish 워크플로 스크래치 (초안·리포트 — 발행 전 임시)
-.pipeline/
 
 # macOS
 .DS_Store
