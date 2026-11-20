@@ -17,8 +17,6 @@ workflow-controller는 이 리소스를 감시하며 실제 실행을 진행한�
 
 ## 구성 요소
 
-<br>
-
 ### Workflow 계열 CRD
 
 | 리소스 | 역할 |
