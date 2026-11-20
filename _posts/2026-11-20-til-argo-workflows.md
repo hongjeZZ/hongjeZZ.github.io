@@ -11,7 +11,9 @@ Argo Workflows는 Kubernetes Operator 패턴으로 만든 워크플로 엔진이
 
 ![Argo Workflows 구성도](/assets/img/til-argo-workflows/architecture.png)
 
-### 구성 요소
+<br>
+
+## 구성 요소
 
 **Workflow 계열 CRD**
 
@@ -69,7 +71,9 @@ step이나 DAG task 하나가 Pod 하나로 실행된다. 기본 구성은 컨�
   - 완료된 Workflow를 etcd에서 지운 뒤에도 조회할 수 있게 아카이브한다.
   - `status.nodes`가 etcd 객체 크기 제한(기본 1.5MiB)에 가까워지면 node 상태를 DB로 옮긴다(node status offload).
 
-### 동작 방식
+<br>
+
+## 동작 방식
 
 두 번째 그림의 순서다.
 
@@ -84,7 +88,9 @@ step이나 DAG task 하나가 Pod 하나로 실행된다. 기본 구성은 컨�
 
 controller는 level-triggered로 동작한다. 이벤트는 reconcile을 시작하는 신호일 뿐이고, 매번 현재 `spec`과 `status` 전체를 다시 평가해 다음 행동을 결정한다. 그래서 이벤트가 유실되거나 controller가 재시작돼도 다음 reconcile이나 주기적 resync에서 같은 결론에 도달한다.
 
-### 설계
+<br>
+
+## 설계
 
 - **Operator 패턴**: 상태는 CR(Custom Resource)에, 로직은 controller에 둔다. kube-apiserver의 watch, RBAC, 영속성을 그대로 이용하므로 별도 DB 없이도 동작한다.
 - **controller와 server의 분리**: 상태를 쓰는 주체는 workflow-controller 하나로 제한했다. argo-server는 상태 없는 API 계층이라 수평 확장할 수 있다. 둘 사이의 결합은 Workflow 리소스뿐이어서, argo-server 없이 kubectl이나 CLI만으로도 Workflow를 운영할 수 있다.
@@ -92,7 +98,9 @@ controller는 level-triggered로 동작한다. 이벤트는 reconcile을 시작�
 - **sidecar와 wrapper**: 출력 수집을 wait sidecar와 emissary wrapper가 맡는다. 그래서 사용자 이미지를 수정하지 않아도 되고, 컨테이너 런타임에도 의존하지 않는다.
 - **상태 크기 관리**: 실행 상태를 CR 안에 두는 구조라 etcd 크기 제한이 생긴다. node status offload와 아카이브가 이 제한에 대응한다.
 
-### 관련 기술
+<br>
+
+## 관련 기술
 
 | 기술 | 관계 |
 |---|---|
@@ -102,7 +110,9 @@ controller는 level-triggered로 동작한다. 이벤트는 reconcile을 시작�
 | **Kubeflow Pipelines** | 파이프라인 실행 백엔드로 Argo Workflows를 사용한다. |
 | **Tekton / Airflow** | Tekton은 같은 Kubernetes 네이티브 방식이지만 CI/CD 파이프라인에 초점을 둔다. Airflow는 별도 스케줄러와 메타데이터 DB를 중심으로 동작한다. |
 
-### References
+<br>
+
+## References
 
 - [Argo Workflows — Architecture](https://argo-workflows.readthedocs.io/en/latest/architecture/)
 - [Argo Server](https://argo-workflows.readthedocs.io/en/release-4.0/argo-server/) · [Argo Server Auth Mode](https://argo-workflows.readthedocs.io/en/latest/argo-server-auth-mode/)
