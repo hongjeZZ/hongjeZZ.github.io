@@ -25,7 +25,11 @@ layout: default
         <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y.%m.%d" }}</time>
         {%- if post.categories.size > 0 -%}<span class="entry-cat">· {{ post.categories | join: "/" }}</span>{%- endif -%}
       </span>
-      {%- assign preview = post.content | strip_html | strip_newlines | truncate: 240 -%}
+      {%- assign preview = post.content | strip_html | strip_newlines -%}
+      {%- comment -%} TIL 글 맨 앞의 AI 작성 안내 패널(til-post 스킬)은 미리보기에서 뺀다. 영어 문장까지 잘라 낸다. {%- endcomment -%}
+      {%- assign ai_notice = 'This post was created with the help of AI.' -%}
+      {%- if preview contains ai_notice -%}{%- assign preview = preview | split: ai_notice | last | strip -%}{%- endif -%}
+      {%- assign preview = preview | truncate: 240 -%}
       {%- if preview != '' -%}
       <span class="entry-ex">{{ preview }}</span>
       {%- endif -%}
