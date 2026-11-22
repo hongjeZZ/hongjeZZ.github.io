@@ -7,6 +7,11 @@ tags: [TIL, Kubernetes, 운영체제, namespace, cgroup]
 
 {% raw %}
 
+> [!NOTE]
+>
+> ※ 본 게시물은 AI(인공지능)를 활용하여 작성된 콘텐츠입니다.<br>
+> ※ This post was created with the help of AI.
+
 컨테이너는 VM처럼 별도의 커널을 띄우지 않습니다. 호스트 Linux 커널 위에서 도는 일반 프로세스이고, 커널 기능 몇 가지로 다른 프로세스와 분리해 둔 것입니다.<br>
 그 기능이 chroot, namespace, cgroup이며, 셋은 제한하는 대상이 서로 다릅니다.
 

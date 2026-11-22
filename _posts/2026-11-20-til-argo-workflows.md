@@ -7,6 +7,11 @@ tags: [TIL, Argo Workflows, Kubernetes, CRD]
 
 {% raw %}
 
+> [!NOTE]
+>
+> ※ 본 게시물은 AI(인공지능)를 활용하여 작성된 콘텐츠입니다.<br>
+> ※ This post was created with the help of AI.
+
 Argo Workflows는 Kubernetes Operator 패턴으로 만든 워크플로 엔진이다. 워크플로 정의와 실행 상태는 Workflow라는 CRD(Custom Resource)에 저장된다.<br>
 workflow-controller는 이 리소스를 감시하며 실제 실행을 진행한다. argo-server는 같은 리소스를 사용자에게 API와 UI로 보여 준다.<br>
 두 컴포넌트는 서로 직접 통신하지 않고, kube-apiserver에 저장된 Workflow 리소스를 공유 상태로 삼는다. 첫 번째 그림이 이 구성이다.
